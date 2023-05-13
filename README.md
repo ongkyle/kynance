@@ -6,4 +6,4 @@ tools for automating options trading
 [x] factor out rh in strategy interface
 [x] validate user input
 [x] scrape optionslam for all it's historical data (where to put it)?
-[ ] calcualate future earning's statistics on my own
+[ ] calculate future earning's statistics on my own

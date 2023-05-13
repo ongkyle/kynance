@@ -1,12 +1,11 @@
-import os, argparser
-from env import *
-from dataframe import *
-from cmds.ticker_report import TickerReport
+import argparser
 from cmds.many_ticker_report import ManyTickerReport
+from cmds.ticker_report import TickerReport
+from env import *
 
 DEFAULT_REQUIRES_ENV_VAR = True
 
-PARSER_CONFIG = {   
+PARSER_CONFIG = {
     "--file": {
         "metavar": "f",
         "type": str,
@@ -93,7 +92,8 @@ REQUIRED_ENV_VARS = {
     "--rh-mfa": "RH_MFA",
     "--ticker": "TICKER",
     "--optionslam-username": "OPTIONSLAM_USERNAME",
-    "--optionslam-password": "OPTIONSLAM_PASSWORD" }
+    "--optionslam-password": "OPTIONSLAM_PASSWORD"}
+
 
 def get_parser_config():
     config = {}
@@ -109,6 +109,7 @@ def create_arg_type(**kwargs):
     arg_type = type('Args', (object,), dict(**kwargs))
     return arg_type
 
+
 def parse_args():
     config = get_parser_config()
     args = argparser.parse_args(
@@ -123,13 +124,13 @@ def parse_args():
 def create_cmd(args):
     if args.do_report == False:
         return TickerReport(args.ticker, args.days,
-                            args.rh_username, args.rh_password, 
+                            args.rh_username, args.rh_password,
                             args.rh_mfa, args.optionslam_username,
                             args.optionslam_password)
     elif args.do_report == True:
         return ManyTickerReport(
             args.days,
-            args.rh_username, args.rh_password, 
+            args.rh_username, args.rh_password,
             args.rh_mfa, args.optionslam_username,
             args.optionslam_password
         )
@@ -139,6 +140,7 @@ def main():
     args = parse_args()
     cmd = create_cmd(args)
     cmd.execute()
-    
+
+
 if __name__ == "__main__":
     main()

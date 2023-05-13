@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 
+
 def ensure_env_vars(vars):
     load_dotenv()
     for var in vars:
@@ -9,10 +10,12 @@ def ensure_env_vars(vars):
         except EnvVarNotFoundException as e:
             raise e
 
+
 def ensure_env_var(var):
     val = os.getenv(var, default=None)
     if val == None:
         raise EnvVarNotFoundException
+
 
 class EnvVarNotFoundException(Exception):
     def __init__(self, var):

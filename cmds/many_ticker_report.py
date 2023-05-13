@@ -3,9 +3,9 @@ from cmd import Cmd
 from robinhood.robinhood import *
 from dataframe import *
 from scraper import Downloader
-from validators.validators import InvalidTickerException, TickerValidator
 from strategies.statistics import Statistics
 from strategies.mixins import StatisticFactory
+
 
 class ManyTickerReport(Cmd):
     def __init__(self, days, client_username, client_password, client_mfa, optionslam_username, optionslam_password):
@@ -18,12 +18,11 @@ class ManyTickerReport(Cmd):
         self.factory = StatisticFactory(days, client_username, client_password, client_mfa)
         self.client = Robinhood(username=self.username, password=self.password, mfa_code=self.mfa)
 
-
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
-        
+
         data = dict()
-        
+
         for ticker in tickers_with_upcoming_earnings:
 
             destination_dir = f"/home/kyle/workspace/kynance/data/{ticker}/"
@@ -31,29 +30,25 @@ class ManyTickerReport(Cmd):
 
             self.download_if_necessary(ticker, destination_file)
 
-            print (ticker)
+            print(ticker)
 
             if self.is_valid_data(destination_file) and self.supports_options(ticker) and self.has_mark_price(ticker):
                 names = data.get("ticker", [])
-                names.append(ticker)    
-                data["ticker"] = names  
+                names.append(ticker)
+                data["ticker"] = names
                 data = self.calculate_statistics(data, destination_file, ticker)
-        
-        df = pd.DataFrame.from_dict(data)
-        print (df)
-        
-            
 
-    
+        df = pd.DataFrame.from_dict(data)
+        print(df)
+
     def get_upcoming_earnings_tickers(self):
         return self.client.get_upcoming_earnings_tickers()
-
 
     def download_if_necessary(self, ticker, file):
         if os.path.exists(file):
             return
         self.download(ticker, file)
-    
+
     def download(self, ticker, file):
 
         login_payload = {
@@ -76,19 +71,19 @@ class ManyTickerReport(Cmd):
             "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         }
 
-        with Downloader(needs_login=True, login_payload=login_payload, 
-                    base_url="https://www.optionslam.com",
-                    download_postfix="/earnings/excel/"+ticker,
-                    login_postfix="/accounts/os_login/",
-                    csrf_attr="csrfmiddlewaretoken",
-                    headers=headers) as d:
+        with Downloader(needs_login=True, login_payload=login_payload,
+                        base_url="https://www.optionslam.com",
+                        download_postfix="/earnings/excel/" + ticker,
+                        login_postfix="/accounts/os_login/",
+                        csrf_attr="csrfmiddlewaretoken",
+                        headers=headers) as d:
             d.download(file)
-    
+
     def calculate_statistics(self, data, source_file, ticker):
         for statistic in Statistics:
             statistic_strategy = self.create_statistic(statistic, source_file, ticker)
             title, stat = statistic_strategy.execute()
-            print (statistic.name, stat)
+            print(statistic.name, stat)
             stats = data.get(title, [])
             if len(stat.index) > 0:
                 stats.append(stat[stat.index[0]])
@@ -99,17 +94,17 @@ class ManyTickerReport(Cmd):
 
     def create_statistic(self, statistic, file, ticker):
         return self.factory.create(statistic, file, ticker)
-    
+
     def is_valid_data(self, file):
         return not self.does_contain_html(file)
 
     def does_contain_html(self, file):
         out = os.popen(f"grep -rHl '<!' {file}").read()
         return out.strip() == file
-    
+
     def supports_options(self, ticker):
         return self.client.get_options_chain(ticker) != None
-    
+
     def has_mark_price(self, ticker):
         latest_price = self.client.get_latest_price(ticker)
         latest_price = round(latest_price)
@@ -123,4 +118,3 @@ class ManyTickerReport(Cmd):
             latest_price += 0.5
             latest_price = round(latest_price, 1)
         return True
-        

@@ -1,5 +1,6 @@
 import argparse
 
+
 def create_parser(config, description):
     parser = argparse.ArgumentParser(description=description)
     for name, config in config.items():
@@ -13,6 +14,3 @@ def create_parser(config, description):
 def parse_args(config, description):
     parser = create_parser(config, description)
     return vars(parser.parse_args())
-
-
-

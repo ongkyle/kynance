@@ -1,5 +1,6 @@
 import datetime
 
+
 class OptionsMixin(object):
     def find_options_by_expiration_and_strike(self, symbols, expiration_date, strike_price, info=None):
         return self.client.find_options_by_expiration_and_strike(
@@ -14,7 +15,7 @@ class OptionsMixin(object):
             option.get("mark_price", None) for option in options
         ]
         return mark_price
-    
+
     def find_options_mark_price_by_strike(self, inputSymbols, strikePrice, optionType=None, info=None):
         options = self.client.find_options_by_strike(inputSymbols, strikePrice, optionType, info)
         mark_price = [
@@ -35,7 +36,7 @@ class OptionsMixin(object):
 
     def convert_to_dates(self, arr):
         return [
-            datetime.date.fromisoformat(date) for date 
+            datetime.date.fromisoformat(date) for date
             in arr
         ]
 
@@ -61,11 +62,11 @@ class OptionsMixin(object):
 
     def convert_to_float(self, arr):
         return [
-            float(ele) for ele in arr 
+            float(ele) for ele in arr
         ]
- 
+
     def calculate_straddle_predicted_movement(self, straddle_price, latest_price):
-        return  100 * (straddle_price / latest_price)
+        return 100 * (straddle_price / latest_price)
 
     def get_closest_option_mark_price(self, symbol, expiration_date, latest_price):
         strike_price = latest_price

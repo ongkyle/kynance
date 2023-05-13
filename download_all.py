@@ -10,8 +10,8 @@ REQUIRED_ENV_VARS = {
     "--rh-password": "RH_PASSWORD",
     "--rh-mfa": "RH_MFA",
     "--optionslam-username": "OPTIONSLAM_USERNAME",
-    "--optionslam-password": "OPTIONSLAM_PASSWORD" }
-PARSER_CONFIG = {   
+    "--optionslam-password": "OPTIONSLAM_PASSWORD"}
+PARSER_CONFIG = {
     "--rh-username": {
         "metavar": "rhu",
         "type": str,
@@ -68,6 +68,7 @@ PARSER_CONFIG = {
     }
 }
 
+
 def get_parser_config():
     config = {}
     ensure_env_vars(REQUIRED_ENV_VARS.values())
@@ -77,9 +78,11 @@ def get_parser_config():
         config[name] = arg_config
     return config
 
+
 def create_arg_type(**kwargs):
     arg_type = type('Args', (object,), dict(**kwargs))
     return arg_type
+
 
 def parse_args():
     config = get_parser_config()
@@ -90,6 +93,7 @@ def parse_args():
     kwargs = {key: value for key, value in args.items()}
     arg_type = create_arg_type(**kwargs)
     return arg_type()
+
 
 def watchlist_symbols(username, password, mfa_code, ignore):
     rh = Robinhood(username=username, password=password, mfa_code=mfa_code)
@@ -103,8 +107,10 @@ def watchlist_symbols(username, password, mfa_code, ignore):
             unique.update(symbols)
     return list(unique)
 
+
 def filter_watchlists(ignore, watchlists):
-    return {k: v for k , v in watchlists.items() if k not in ignore}
+    return {k: v for k, v in watchlists.items() if k not in ignore}
+
 
 def download(ticker, optionslam_username, optionslam_password, file):
     print(f"Downloading symbol: {ticker} to file: {file}")
@@ -129,14 +135,15 @@ def download(ticker, optionslam_username, optionslam_password, file):
         "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
     }
 
-    with Downloader(needs_login=True, login_payload=login_payload, 
-                base_url="https://www.optionslam.com",
-                download_postfix="/earnings/excel/"+ticker,
-                login_postfix="/accounts/os_login/",
-                csrf_attr="csrfmiddlewaretoken",
-                headers=headers) as d:
+    with Downloader(needs_login=True, login_payload=login_payload,
+                    base_url="https://www.optionslam.com",
+                    download_postfix="/earnings/excel/" + ticker,
+                    login_postfix="/accounts/os_login/",
+                    csrf_attr="csrfmiddlewaretoken",
+                    headers=headers) as d:
         d.download(file)
     return f"Finished Downloading symbol: {ticker} to file: {file}"
+
 
 def submit_fn_to_executor(executor, fn, tickers, username, password):
     future_to_symbol = dict()
@@ -144,7 +151,7 @@ def submit_fn_to_executor(executor, fn, tickers, username, password):
         destination_dir = f"/home/kyle/workspace/kynance/data/{symbol}/"
         destination_file = os.path.join(destination_dir, "earnings.csv")
         future = executor.submit(
-            fn, 
+            fn,
             symbol,
             username,
             password,
@@ -152,6 +159,7 @@ def submit_fn_to_executor(executor, fn, tickers, username, password):
         )
         future_to_symbol[future] = symbol
     return future_to_symbol
+
 
 def resolve_futures(futures):
     for future in concurrent.futures.as_completed(futures):
@@ -162,6 +170,7 @@ def resolve_futures(futures):
             print('%r generated an exception: %s' % (res, exc))
         else:
             print(data)
+
 
 def main():
     args = parse_args()
@@ -175,11 +184,10 @@ def main():
     symbols_to_fetch = watchlist_symbols(rh_username, rh_password, rh_mfa, ignore)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_symbol = submit_fn_to_executor(executor, download, symbols_to_fetch, optionslam_username, optionslam_password)
+        future_to_symbol = submit_fn_to_executor(executor, download, symbols_to_fetch, optionslam_username,
+                                                 optionslam_password)
         resolve_futures(future_to_symbol)
 
-
-        
 
 if __name__ == "__main__":
     main()
