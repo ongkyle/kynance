@@ -1,13 +1,17 @@
 import os
+from collections import deque
+
 from cmd import Cmd
 from robinhood.robinhood import *
 from dataframe import *
 from scraper import Downloader
 from strategies.statistics import Statistics
 from strategies.mixins import StatisticFactory
+from validators.mixins import ValidatorMixin
+from itertools import islice
 
 
-class ManyTickerReport(Cmd):
+class ManyTickerReport(Cmd, ValidatorMixin):
     def __init__(self, days, client_username, client_password, client_mfa, optionslam_username, optionslam_password):
         self.days = days
         self.username = client_username
@@ -23,26 +27,36 @@ class ManyTickerReport(Cmd):
 
         data = dict()
 
-        for ticker in tickers_with_upcoming_earnings:
-
-            destination_dir = f"/home/kyle/workspace/kynance/data/{ticker}/"
+        while tickers_with_upcoming_earnings:
+            ticker = tickers_with_upcoming_earnings.pop()
+            destination_dir = f"{os.getcwd()}/data/{ticker}/"
             destination_file = os.path.join(destination_dir, "earnings.csv")
+
+            try:
+                self.validate_ticker(ticker, self.client)
+                self.validate_data(destination_file)
+                self.validate_options(ticker, self.client)
+            except Exception as e:
+                print(e)
+                continue
 
             self.download_if_necessary(ticker, destination_file)
 
-            print(ticker)
-
-            if self.is_valid_data(destination_file) and self.supports_options(ticker) and self.has_mark_price(ticker):
-                names = data.get("ticker", [])
-                names.append(ticker)
-                data["ticker"] = names
-                data = self.calculate_statistics(data, destination_file, ticker)
+            names = data.get("ticker", [])
+            names.append(ticker)
+            data["ticker"] = names
+            data = self.calculate_statistics(data, destination_file, ticker)
 
         df = pd.DataFrame.from_dict(data)
         print(df)
 
+    @staticmethod
+    def skip_this_ticker(seq):
+        next(islice(seq, 1, None), None)
+
     def get_upcoming_earnings_tickers(self):
-        return self.client.get_upcoming_earnings_tickers()
+        tickers = self.client.get_upcoming_earnings_tickers()
+        return deque(tickers)
 
     def download_if_necessary(self, ticker, file):
         if os.path.exists(file):
@@ -83,7 +97,6 @@ class ManyTickerReport(Cmd):
         for statistic in Statistics:
             statistic_strategy = self.create_statistic(statistic, source_file, ticker)
             title, stat = statistic_strategy.execute()
-            print(statistic.name, stat)
             stats = data.get(title, [])
             if len(stat.index) > 0:
                 stats.append(stat[stat.index[0]])
@@ -95,24 +108,12 @@ class ManyTickerReport(Cmd):
     def create_statistic(self, statistic, file, ticker):
         return self.factory.create(statistic, file, ticker)
 
-    def is_valid_data(self, file):
-        return not self.does_contain_html(file)
-
-    def does_contain_html(self, file):
-        out = os.popen(f"grep -rHl '<!' {file}").read()
-        return out.strip() == file
-
-    def supports_options(self, ticker):
-        return self.client.get_options_chain(ticker) != None
-
     def has_mark_price(self, ticker):
         latest_price = self.client.get_latest_price(ticker)
         latest_price = round(latest_price)
         prices = []
         while len(prices) == 0:
-            print(latest_price)
             prices = self.client.find_options_mark_price_by_strike(ticker, latest_price)
-            print(prices)
             if None in prices:
                 return False
             latest_price += 0.5

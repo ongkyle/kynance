@@ -25,7 +25,7 @@ class TickerReport(Cmd):
     def execute(self):
         self.validate_ticker()
 
-        destination_dir = f"/home/kyle/workspace/kynance/data/{self.ticker}/"
+        destination_dir = f"{os.getcwd()}/data/{self.ticker}/"
         destination_file = os.path.join(destination_dir, "earnings.csv")
 
         self.download(destination_file)
@@ -81,4 +81,4 @@ class TickerReport(Cmd):
         df.print(titles)
 
     def create_statistic(self, statistic, file):
-        return self.factory.create(statistic, file)
+        return self.factory.create(statistic, file, self.ticker)
