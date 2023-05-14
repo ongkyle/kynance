@@ -15,7 +15,8 @@ from validators.mixins import ValidatorMixin
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
-    def __init__(self, tickers, days, client_username, client_password, client_mfa, optionslam_username, optionslam_password):
+    def __init__(self, tickers, days, client_username, client_password, client_mfa, optionslam_username,
+                 optionslam_password):
         self.ticker = tickers
         self.days = days
         self.username = client_username
@@ -32,7 +33,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_symbol = self.submit_fn_to_executor(executor,
-                                                          self.download_and_calculate_statistics,
+                                                          self.assemble_data,
                                                           valid_tickers)
         data = self.resolve_futures(future_to_symbol)
         df = pd.DataFrame.from_dict(data)
@@ -40,9 +41,10 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         df = self.reorder_cols(df)
         print(df)
 
-    def reorder_cols(self, df):
+    @staticmethod
+    def reorder_cols(df):
         cols = df.columns.to_list()
-        cols = cols[-1:] + cols[:-1]
+        cols = cols[-2:] + cols[:-2]
         df = df[cols]
         return df
 
@@ -54,7 +56,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
 
             try:
                 self.validate_ticker(ticker, self.client)
-                # self.validate_data(destination_file)
+                self.validate_data(destination_file)
                 self.validate_options(ticker, self.client)
             except Exception as e:
                 print(e)
@@ -77,7 +79,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
             data[title] = stats
         return data
 
-    def download_and_calculate_statistics(self, ticker, destination_file):
+    def assemble_data(self, ticker, destination_file):
         self.download_if_necessary(ticker, destination_file)
         data = self.calculate_statistics(destination_file, ticker)
 
@@ -85,7 +87,11 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         names.append(ticker)
         data["ticker"] = names
 
+        data["earning date"] = self.get_next_earning_date(ticker)
         return data
+
+    def get_next_earning_date(self, ticker):
+        return self.client.get_next_earnings_date(ticker)
 
     @staticmethod
     def submit_fn_to_executor(executor, fn, tickers):
@@ -125,9 +131,8 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         return deque(tickers)
 
     def download_if_necessary(self, ticker, file):
-        if os.path.exists(file):
-            return
-        self.download(ticker, file)
+        if not os.path.exists(file):
+            self.download(ticker, file)
 
     def download(self, ticker, file):
 

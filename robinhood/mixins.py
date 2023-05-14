@@ -25,7 +25,7 @@ class OptionsMixin(object):
 
     def get_earnings_report(self, symbols):
         earnings = self.client.get_earnings(symbol=symbols, info="report")
-        earnings = [earning for earning in earnings if earning != None]
+        earnings = [earning for earning in earnings if earning is not None]
         return [report["date"] for report in earnings]
 
     def get_closest(self, needle, haystack):
