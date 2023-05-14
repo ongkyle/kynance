@@ -5,6 +5,15 @@ from env import *
 
 DEFAULT_REQUIRES_ENV_VAR = True
 
+
+REQUIRED_ENV_VARS = {
+    "--rh-username": "RH_USERNAME",
+    "--rh-password": "RH_PASSWORD",
+    "--rh-mfa": "RH_MFA",
+    "--tickers": "TICKERS",
+    "--optionslam-username": "OPTIONSLAM_USERNAME",
+    "--optionslam-password": "OPTIONSLAM_PASSWORD"}
+
 PARSER_CONFIG = {
     "--file": {
         "metavar": "f",
@@ -51,14 +60,15 @@ PARSER_CONFIG = {
         "help": "robinhood password. can also set RH_MFA env var",
         "dest": "rh_mfa"
     },
-    "--ticker": {
+    "--tickers": {
         "metavar": "t",
         "type": str,
         "required": False,
         "action": "store",
+        "nargs": "*",
         "default": DEFAULT_REQUIRES_ENV_VAR,
-        "help": "ticker / symbol to fetch",
-        "dest": "ticker"
+        "help": "ticker(s) / symbol(s) to fetch",
+        "dest": "tickers"
     },
     "--optionslam-username": {
         "metavar": "osu",
@@ -85,15 +95,6 @@ PARSER_CONFIG = {
         "dest": "do_report"
     }
 }
-
-REQUIRED_ENV_VARS = {
-    "--rh-username": "RH_USERNAME",
-    "--rh-password": "RH_PASSWORD",
-    "--rh-mfa": "RH_MFA",
-    "--ticker": "TICKER",
-    "--optionslam-username": "OPTIONSLAM_USERNAME",
-    "--optionslam-password": "OPTIONSLAM_PASSWORD"}
-
 
 def get_parser_config():
     config = {}
@@ -123,12 +124,13 @@ def parse_args():
 
 def create_cmd(args):
     if args.do_report == False:
-        return TickerReport(args.ticker, args.days,
+        return TickerReport(args.tickers, args.days,
                             args.rh_username, args.rh_password,
                             args.rh_mfa, args.optionslam_username,
                             args.optionslam_password)
     elif args.do_report == True:
         return ManyTickerReport(
+            args.tickers,
             args.days,
             args.rh_username, args.rh_password,
             args.rh_mfa, args.optionslam_username,

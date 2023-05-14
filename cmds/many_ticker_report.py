@@ -15,7 +15,8 @@ from validators.mixins import ValidatorMixin
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
-    def __init__(self, days, client_username, client_password, client_mfa, optionslam_username, optionslam_password):
+    def __init__(self, tickers, days, client_username, client_password, client_mfa, optionslam_username, optionslam_password):
+        self.ticker = tickers
         self.days = days
         self.username = client_username
         self.password = client_password
@@ -53,7 +54,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
 
             try:
                 self.validate_ticker(ticker, self.client)
-                self.validate_data(destination_file)
+                # self.validate_data(destination_file)
                 self.validate_options(ticker, self.client)
             except Exception as e:
                 print(e)

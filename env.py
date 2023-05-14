@@ -14,7 +14,7 @@ def ensure_env_vars(vars):
 def ensure_env_var(var):
     val = os.getenv(var, default=None)
     if val == None:
-        raise EnvVarNotFoundException
+        raise EnvVarNotFoundException(var)
 
 
 class EnvVarNotFoundException(Exception):
