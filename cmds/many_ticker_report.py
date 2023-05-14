@@ -1,5 +1,9 @@
+import concurrent.futures
 import os
 from collections import deque
+from itertools import islice
+
+import numpy as np
 
 from cmd import Cmd
 from robinhood.robinhood import *
@@ -8,7 +12,6 @@ from scraper import Downloader
 from strategies.statistics import Statistics
 from strategies.mixins import StatisticFactory
 from validators.mixins import ValidatorMixin
-from itertools import islice
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
@@ -24,11 +27,27 @@ class ManyTickerReport(Cmd, ValidatorMixin):
 
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
+        valid_tickers = self.filter_valid_tickers(tickers_with_upcoming_earnings)
 
-        data = dict()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future_to_symbol = self.submit_fn_to_executor(executor,
+                                                          self.download_and_calculate_statistics,
+                                                          valid_tickers)
+        data = self.resolve_futures(future_to_symbol)
+        df = pd.DataFrame.from_dict(data)
 
-        while tickers_with_upcoming_earnings:
-            ticker = tickers_with_upcoming_earnings.pop()
+        df = self.reorder_cols(df)
+        print(df)
+
+    def reorder_cols(self, df):
+        cols = df.columns.to_list()
+        cols = cols[-1:] + cols[:-1]
+        df = df[cols]
+        return df
+
+    def filter_valid_tickers(self, tickers):
+        valid_tickers = []
+        for idx, ticker in enumerate(tickers):
             destination_dir = f"{os.getcwd()}/data/{ticker}/"
             destination_file = os.path.join(destination_dir, "earnings.csv")
 
@@ -40,15 +59,61 @@ class ManyTickerReport(Cmd, ValidatorMixin):
                 print(e)
                 continue
 
-            self.download_if_necessary(ticker, destination_file)
+            valid_tickers.append(ticker)
 
-            names = data.get("ticker", [])
-            names.append(ticker)
-            data["ticker"] = names
-            data = self.calculate_statistics(data, destination_file, ticker)
+        return valid_tickers
 
-        df = pd.DataFrame.from_dict(data)
-        print(df)
+    def calculate_statistics(self, source_file, ticker):
+        data = dict()
+        for statistic in Statistics:
+            statistic_strategy = self.create_statistic(statistic, source_file, ticker)
+            title, stat = statistic_strategy.execute()
+            stats = data.get(title, [])
+            if len(stat.index) > 0:
+                stats.append(stat[stat.index[0]])
+            else:
+                stats.append(None)
+            data[title] = stats
+        return data
+
+    def download_and_calculate_statistics(self, ticker, destination_file):
+        self.download_if_necessary(ticker, destination_file)
+        data = self.calculate_statistics(destination_file, ticker)
+
+        names = data.get("ticker", [])
+        names.append(ticker)
+        data["ticker"] = names
+
+        return data
+
+    @staticmethod
+    def submit_fn_to_executor(executor, fn, tickers):
+        future_to_symbol = dict()
+        for symbol in tickers:
+            destination_dir = f"/{os.getcwd()}/data/{symbol}/"
+            destination_file = os.path.join(destination_dir, "earnings.csv")
+            future = executor.submit(
+                fn,
+                symbol,
+                destination_file
+            )
+            future_to_symbol[future] = symbol
+        return future_to_symbol
+
+    @staticmethod
+    def resolve_futures(futures):
+        data = dict()
+        for future in concurrent.futures.as_completed(futures):
+            res = futures[future]
+            try:
+                res = future.result()
+            except Exception as exc:
+                print('%r generated an exception: %s' % (res, exc))
+            else:
+                for k, v in res.items():
+                    stats = data.get(k, [])
+                    data[k] = np.append(stats, v)
+        return data
 
     @staticmethod
     def skip_this_ticker(seq):
@@ -93,29 +158,5 @@ class ManyTickerReport(Cmd, ValidatorMixin):
                         headers=headers) as d:
             d.download(file)
 
-    def calculate_statistics(self, data, source_file, ticker):
-        for statistic in Statistics:
-            statistic_strategy = self.create_statistic(statistic, source_file, ticker)
-            title, stat = statistic_strategy.execute()
-            stats = data.get(title, [])
-            if len(stat.index) > 0:
-                stats.append(stat[stat.index[0]])
-            else:
-                stats.append(None)
-            data[title] = stats
-        return data
-
     def create_statistic(self, statistic, file, ticker):
         return self.factory.create(statistic, file, ticker)
-
-    def has_mark_price(self, ticker):
-        latest_price = self.client.get_latest_price(ticker)
-        latest_price = round(latest_price)
-        prices = []
-        while len(prices) == 0:
-            prices = self.client.find_options_mark_price_by_strike(ticker, latest_price)
-            if None in prices:
-                return False
-            latest_price += 0.5
-            latest_price = round(latest_price, 1)
-        return True

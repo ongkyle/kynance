@@ -35,11 +35,23 @@ class OptionsValidator(Validator):
         self.client = client
 
     def validate(self):
-        if not self.supports_options(self.ticker):
+        if not self.supports_options():
             raise InvalidOptionException(self.ticker)
 
-    def supports_options(self, ticker):
-        return self.client.get_options_chain(ticker) is not None
+    def supports_options(self):
+        return self.client.get_options_chain(self.ticker) is not None
+
+    def has_mark_price(self):
+        latest_price = self.client.get_latest_price(self.ticker)
+        latest_price = round(latest_price)
+        prices = []
+        while len(prices) == 0:
+            prices = self.client.find_options_mark_price_by_strike(self.ticker, latest_price)
+            if None in prices:
+                return False
+            latest_price += 0.5
+            latest_price = round(latest_price, 1)
+        return True
 
 
 class InvalidDataException(Exception):
