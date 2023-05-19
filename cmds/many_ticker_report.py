@@ -15,8 +15,9 @@ from validators.mixins import ValidatorMixin
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
-    def __init__(self, tickers, days, client_username, client_password, client_mfa, optionslam_username,
+    def __init__(self, max_workers, tickers, days, client_username, client_password, client_mfa, optionslam_username,
                  optionslam_password):
+        self.max_workers = max_workers
         self.ticker = tickers
         self.days = days
         self.username = client_username
@@ -30,8 +31,8 @@ class ManyTickerReport(Cmd, ValidatorMixin):
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
         valid_tickers = self.filter_valid_tickers(tickers_with_upcoming_earnings)
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        print (self.max_workers)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_symbol = self.submit_fn_to_executor(executor,
                                                           self.assemble_data,
                                                           valid_tickers)
@@ -50,9 +51,11 @@ class ManyTickerReport(Cmd, ValidatorMixin):
 
     def filter_valid_tickers(self, tickers):
         valid_tickers = []
+        print (self.max_workers)
         for idx, ticker in enumerate(tickers):
             destination_dir = f"{os.getcwd()}/data/{ticker}/"
             destination_file = os.path.join(destination_dir, "earnings.csv")
+            self.download_if_necessary(ticker, destination_file)
 
             try:
                 self.validate_ticker(ticker, self.client)
@@ -68,6 +71,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
 
     def calculate_statistics(self, source_file, ticker):
         data = dict()
+        print (f"Calculating Statistics: {ticker}")
         for statistic in Statistics:
             statistic_strategy = self.create_statistic(statistic, source_file, ticker)
             title, stat = statistic_strategy.execute()
@@ -80,7 +84,6 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         return data
 
     def assemble_data(self, ticker, destination_file):
-        self.download_if_necessary(ticker, destination_file)
         data = self.calculate_statistics(destination_file, ticker)
 
         names = data.get("ticker", [])

@@ -16,6 +16,7 @@ class TickerValidator(Validator):
         self.client = client
 
     def validate(self):
+        print(f"Validating Ticker: {self.ticker}")
         does_exist = self.client.exists(self.ticker)
         if not does_exist:
             raise InvalidTickerException(ticker=self.ticker)
@@ -35,6 +36,7 @@ class OptionsValidator(Validator):
         self.client = client
 
     def validate(self):
+        print(f"Validating Options: {self.ticker}")
         if not self.supports_options():
             raise InvalidOptionException(self.ticker)
 
@@ -67,6 +69,7 @@ class DataValidator(Validator):
         self.file = file
 
     def validate(self):
+        print(f"Validating Data: {self.file}")
         if not self.is_valid_data():
             raise InvalidDataException(self.file)
 

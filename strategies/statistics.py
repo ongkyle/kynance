@@ -10,6 +10,8 @@ class Statistics(Enum):
     max_mean = 1
     max_median = 2
     straddle_predicted_move = 3
+    upwards_profit_probability = 4
+    downwards_profit_probability = 5
 
 
 class Statistic(Dataframe):
@@ -102,3 +104,45 @@ class StraddlePredictedMovement(RhStatistic, Strategy):
     @property
     def title(self):
         return f"{self.stat_name} %"
+
+
+class ProfitProbability(RhStatistic, Strategy):
+
+    def get_previous_moves(self):
+        raise NotImplementedError()
+
+    def execute(self):
+        return self.title, self.calculate_profit_probability()
+
+    def calculate_profit_probability(self):
+        num_earnings = self.df.shape[0]
+        if num_earnings <= 0:
+            return pd.Series(0)
+        straddle_predicted_movement = self.get_straddle_predicted_movement()
+        previous_moves = self.get_previous_moves()
+        comparison = straddle_predicted_movement.values < previous_moves.values
+        probability = (comparison.sum() / num_earnings) * 100
+        probability = round(probability, 2)
+        return pd.Series(probability)
+
+    def get_straddle_predicted_movement(self):
+        num_earnings = self.df.shape[0]
+        straddle_predicted_movement = self.rh.get_straddle_predicted_movement(self.ticker)
+        straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(num_earnings))
+        return straddle_predicted_movement
+
+    @property
+    def title(self):
+        return f"{self.stat_name}"
+
+
+class UpwardsProfitProbability(ProfitProbability):
+
+    def get_previous_moves(self):
+        return self.df["One Day High"]
+
+
+class DownwardsProfitProbability(ProfitProbability):
+
+    def get_previous_moves(self):
+        return self.df["One Day Low"]

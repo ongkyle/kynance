@@ -16,16 +16,16 @@ REQUIRED_ENV_VARS = {
 
 PARSER_CONFIG = {
     "--file": {
-        "metavar": "f",
+        "metavar": "file",
         "type": str,
         "required": False,
         "action": "store",
-        "help": "csv file containing optionsslam data for a single ticker",
+        "help": "csv file containing optionslam data for a single ticker",
         "dest": "file",
 
     },
     "--days": {
-        "metavar": "d",
+        "metavar": "days",
         "type": int,
         "required": False,
         "action": "store",
@@ -34,7 +34,7 @@ PARSER_CONFIG = {
         "dest": "days"
     },
     "--rh-username": {
-        "metavar": "rhu",
+        "metavar": "robinhood username",
         "type": str,
         "required": False,
         "action": "store",
@@ -43,7 +43,7 @@ PARSER_CONFIG = {
         "dest": "rh_username"
     },
     "--rh-password": {
-        "metavar": "rhu",
+        "metavar": "robinhood password",
         "type": str,
         "required": False,
         "action": "store",
@@ -52,7 +52,7 @@ PARSER_CONFIG = {
         "dest": "rh_password"
     },
     "--rh-mfa": {
-        "metavar": "rhmfa",
+        "metavar": "robinhood mfa code",
         "type": str,
         "required": False,
         "action": "store",
@@ -61,7 +61,7 @@ PARSER_CONFIG = {
         "dest": "rh_mfa"
     },
     "--tickers": {
-        "metavar": "t",
+        "metavar": "tickers",
         "type": str,
         "required": False,
         "action": "store",
@@ -71,7 +71,7 @@ PARSER_CONFIG = {
         "dest": "tickers"
     },
     "--optionslam-username": {
-        "metavar": "osu",
+        "metavar": "optionslam username",
         "type": str,
         "required": False,
         "action": "store",
@@ -80,7 +80,7 @@ PARSER_CONFIG = {
         "dest": "optionslam_username"
     },
     "--optionslam-password": {
-        "metavar": "osp",
+        "metavar": "optionslam password",
         "type": str,
         "required": False,
         "action": "store",
@@ -93,6 +93,15 @@ PARSER_CONFIG = {
         "action": "store_true",
         "help": "option to generate a report for earnings within the next 7 days",
         "dest": "do_report"
+    },
+    "--max-workers": {
+        "metavar": "max workers",
+        "required": False,
+        "type": int,
+        "default": None,
+        "action": "store",
+        "help": "number of workers generating a report",
+        "dest": "max_workers"
     }
 }
 
@@ -130,6 +139,7 @@ def create_cmd(args):
                             args.optionslam_password)
     elif args.do_report == True:
         return ManyTickerReport(
+            args.max_workers,
             args.tickers,
             args.days,
             args.rh_username, args.rh_password,

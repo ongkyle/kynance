@@ -65,7 +65,8 @@ class OptionsMixin(object):
             float(ele) for ele in arr
         ]
 
-    def calculate_straddle_predicted_movement(self, straddle_price, latest_price):
+    @staticmethod
+    def calculate_straddle_predicted_movement(straddle_price, latest_price):
         return 100 * (straddle_price / latest_price)
 
     def get_closest_option_mark_price(self, symbol, expiration_date, latest_price):
