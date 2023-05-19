@@ -56,3 +56,6 @@ class Robinhood(OptionsMixin):
 
     def get_upcoming_earnings_tickers(self):
         return self.client.get_all_stocks_from_market_tag('upcoming-earnings', "symbol")
+
+    def export_option_trade_history(self, dir_path, file_name=None):
+        return self.client.export_completed_option_orders(dir_path, file_name)

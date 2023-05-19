@@ -10,8 +10,7 @@ class Statistics(Enum):
     max_mean = 1
     max_median = 2
     straddle_predicted_move = 3
-    upwards_profit_probability = 4
-    downwards_profit_probability = 5
+    profit_probability = 4
 
 
 class Statistic(Dataframe):
@@ -119,11 +118,11 @@ class ProfitProbability(RhStatistic, Strategy):
         if num_earnings <= 0:
             return pd.Series(0)
         straddle_predicted_movement = self.get_straddle_predicted_movement()
-        previous_moves = self.get_previous_moves()
-        comparison = straddle_predicted_movement.values < previous_moves.values
+        max_moves = self.get_max_moves()
+        comparison = straddle_predicted_movement.values < max_moves.abs().values
         probability = (comparison.sum() / num_earnings) * 100
         probability = round(probability, 2)
-        return pd.Series(probability)
+        return pd.Series(probability, index=[self.df.shape[0] - 1])
 
     def get_straddle_predicted_movement(self):
         num_earnings = self.df.shape[0]
@@ -131,9 +130,12 @@ class ProfitProbability(RhStatistic, Strategy):
         straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(num_earnings))
         return straddle_predicted_movement
 
+    def get_max_moves(self):
+        return self.df["Max Move"]
+
     @property
     def title(self):
-        return f"{self.stat_name}"
+        return f"{self.stat_name} %"
 
 
 class UpwardsProfitProbability(ProfitProbability):

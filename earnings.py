@@ -1,10 +1,10 @@
 import argparser
+from cmds.journal import Journal, JournalBackfill, JournalUpdate
 from cmds.many_ticker_report import ManyTickerReport
 from cmds.ticker_report import TickerReport
 from env import *
 
 DEFAULT_REQUIRES_ENV_VAR = True
-
 
 REQUIRED_ENV_VARS = {
     "--rh-username": "RH_USERNAME",
@@ -12,7 +12,8 @@ REQUIRED_ENV_VARS = {
     "--rh-mfa": "RH_MFA",
     "--tickers": "TICKERS",
     "--optionslam-username": "OPTIONSLAM_USERNAME",
-    "--optionslam-password": "OPTIONSLAM_PASSWORD"}
+    "--optionslam-password": "OPTIONSLAM_PASSWORD",
+    "--journal-file-path": "JOURNAL_FILE_PATH"}
 
 PARSER_CONFIG = {
     "--file": {
@@ -102,15 +103,37 @@ PARSER_CONFIG = {
         "action": "store",
         "help": "number of workers generating a report",
         "dest": "max_workers"
-    }
+    },
+    "--journal": {
+        "required": False,
+        "action": "store_true",
+        "help": "option to update trading journal with latest entries",
+        "dest": "do_journal"
+    },
+    "--backfill": {
+        "required": False,
+        "action": "store_true",
+        "help": "option to backfill trading journal with all entries",
+        "dest": "do_journal_backfill"
+    },
+    "--journal-file-path": {
+        "metavar": "journal file path",
+        "type": str,
+        "required": False,
+        "action": "store",
+        "default": DEFAULT_REQUIRES_ENV_VAR,
+        "help": "absolute file location of journal.csv",
+        "dest": "journal_file_path"
+    },
 }
+
 
 def get_parser_config():
     config = {}
     ensure_env_vars(REQUIRED_ENV_VARS.values())
     for name, arg_config in PARSER_CONFIG.items():
         if arg_config.get("default", None) == DEFAULT_REQUIRES_ENV_VAR:
-            arg_config["default"] = os.getenv(REQUIRED_ENV_VARS[name])
+            arg_config["default"] = parse_env_var(REQUIRED_ENV_VARS[name])
         config[name] = arg_config
     return config
 
@@ -132,12 +155,26 @@ def parse_args():
 
 
 def create_cmd(args):
-    if args.do_report == False:
-        return TickerReport(args.tickers, args.days,
+    if args.do_journal and (not args.do_journal_backfill):
+        return JournalUpdate(
+            args.journal_file_path,
+            args.rh_username,
+            args.rh_password,
+            args.rh_mfa
+        )
+    elif args.do_journal and args.do_journal_backfill:
+        return JournalBackfill(
+            args.journal_file_path,
+            args.rh_username,
+            args.rh_password,
+            args.rh_mfa
+        )
+    elif not (args.do_report or args.do_journal):
+        return TickerReport(args.tickers[0], args.days,
                             args.rh_username, args.rh_password,
                             args.rh_mfa, args.optionslam_username,
                             args.optionslam_password)
-    elif args.do_report == True:
+    elif args.do_report & (not args.do_journal):
         return ManyTickerReport(
             args.max_workers,
             args.tickers,

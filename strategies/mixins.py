@@ -1,7 +1,6 @@
 from strategies.statistics import ClosePercent, \
     MaxMeanMovement, MaxMedianMovement, \
-    StraddlePredictedMovement, UpwardsProfitProbability, \
-    DownwardsProfitProbability, Statistics
+    StraddlePredictedMovement, ProfitProbability, Statistics
 
 
 class StatisticFactory(object):
@@ -26,16 +25,8 @@ class StatisticFactory(object):
                     self.client_password,
                     self.client_mfa,
                     ticker)
-            case Statistics.upwards_profit_probability:
-                return UpwardsProfitProbability(
-                    stat.name, file,
-                    self.client_username,
-                    self.client_password,
-                    self.client_mfa,
-                    ticker
-                )
-            case Statistics.downwards_profit_probability:
-                return DownwardsProfitProbability(
+            case Statistics.profit_probability:
+                return ProfitProbability(
                     stat.name, file,
                     self.client_username,
                     self.client_password,
