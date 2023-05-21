@@ -1,0 +1,886 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<title>  Earning History and Price Movements Analysis </title> 
+<meta name="description" content="Investment Trading Social Network"> 
+<meta name="keywords" content="  Earning History Straddle Options Statistics "> 
+
+
+<link href="/site_media/css/grow500.css" rel="stylesheet" type="text/css" /> 
+<link href="/site_media/css/menu.css" rel="stylesheet" type="text/css" /> 
+<link href="/site_media/css/shadow.css" rel="stylesheet" type="text/css" /> 
+
+
+ 
+<style type="text/css">
+.ui-icon-red { width: 16px; height: 16px; background-image: url(/site_media/images/ui-icons_red.png); }
+.ui-icon-blue { width: 16px; height: 16px; background-image: url(/site_media/images/ui-icons_blue.png); }
+#testimonials {width: 500px;height: 20px;list-style-type: none}
+#testimonials .slide {}
+blockquote {font-size: 18px;font-family: Georgia, "Times New Roman", Times, serif;color: #955443;font-style: italic}
+
+  #sidemenu {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    width: 11em;
+    margin: 0 0 0 0;
+    z-index: 5;
+    #background: hsla(80, 90%, 40%, 0.7);
+    #background: hsla(25%, 50%, 0%, 0.7);
+    background: #222222;
+    color: white;
+    font-weight: bold;
+    font-size: 10;
+    text-align: left;
+    border: solid hsla(80, 90%, 40%, 0.5);
+    border-right: none;
+    padding: 0.5em 0.5em 0.5em 2em;
+    box-shadow: 0 1px 3px black;
+    border-radius: 3em 0.5em 0.5em 3em;
+  }
+  #sidemenu ul { margin: 0 }
+  #sidemenu li { margin: 0 }
+  #sidemenu a { color: inherit }
+  .showmenu { display: none; }
+
+  /* Make menu absolute, not fixed, on IE 5 & 6 */
+  #sidemenu { position: absolute }
+  *>#sidemenu { position: fixed }
+
+  #sidemenu p { color:white; font-size: 12; margin: 0 0 0 0;}
+
+   #top_message_box {  
+    position: fixed;  
+    bottom: 3px; 
+    right: 40px;
+    /*left: 0;  */
+    z-index: 10;  
+    background:#447700;  
+    padding:10px;  
+    border:1px solid #CCCCCC;  
+    text-align:center;  
+    font-weight:bold;  
+    font-size:14px;
+    color:#000000;
+    padding-right:20px;
+    width:80%;  
+	-moz-border-radius-topright:6px;
+	-moz-border-radius-topleft:6px;
+	-webkit-border-top-right-radius:6px;
+	-webkit-border-top-left-radius:6px;
+	border-bottom-right-radius:6px;
+	border-bottom-left-radius:6px;
+	-moz-border-radius-bottomright:6px;
+	-moz-border-radius-bottomleft:6px;
+	-webkit-border-bottom-right-radius:6px;
+	-webkit-border-bottom-left-radius:6px;
+}
+
+</style>
+
+
+ 
+<script type="text/javascript" src="/site_media/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="/site_media/js/grow500.js"></script>
+<script type="text/javascript" src="/site_media/js/menu.js"></script>
+<script type="text/javascript" src="/site_media/js/cookie.js"></script>
+
+<script class="include" type="text/javascript" src="/site_media/chart/jquery.min.js"></script>
+<link class="include" type="text/css" href="/site_media/jquery-ui/css/smoothness/jquery-ui.min.css" rel="Stylesheet" />
+<script class="include" type="text/javascript" src="/site_media/jquery-ui/js/jquery-ui.min.js"></script>
+
+<script language="javascript">
+
+	$(function() {
+
+	 $("#add_to_watch_list").dialog({
+		autoOpen: false,
+	 });
+	 $("#topmenu_login").dialog({
+		autoOpen: false,
+	 });
+
+	  $('#top_message_box').fadeIn('slow', function () {
+	    $(this).delay(5000).fadeOut(13000);
+	  });
+
+	 var hidemenu_cookie=docCookies.getItem("hidemenu_cookie");
+	 if (hidemenu_cookie == "hide") {
+		var sidemenu = document.getElementById("sidemenu_list");
+		sidemenu.style.display = "None";
+		var hidemenulink = document.getElementById("hide_menu_link");
+		hidemenulink.style.display = "None";
+		var showmenulink = document.getElementById("show_menu_link");
+		showmenulink.style.display = "Inline";
+		var sidebar = document.getElementById("sidemenu");
+		sidebar.style.top = "90%";
+	 }
+	});
+	function hide_sidemenu() {
+		var sidemenu = document.getElementById("sidemenu_list");
+		sidemenu.style.display = "None";
+		var hidemenulink = document.getElementById("hide_menu_link");
+		hidemenulink.style.display = "None";
+		var showmenulink = document.getElementById("show_menu_link");
+		showmenulink.style.display = "Inline";
+		var sidebar = document.getElementById("sidemenu");
+		sidebar.style.top = "90%";
+		docCookies.setItem("hidemenu_cookie", "hide", null, "/");
+	}
+	function show_sidemenu() {
+		var sidemenu = document.getElementById("sidemenu_list");
+		sidemenu.style.display = "Inline";
+		var hidemenulink = document.getElementById("hide_menu_link");
+		hidemenulink.style.display = "Inline";
+		var showmenulink = document.getElementById("show_menu_link");
+		showmenulink.style.display = "None";
+		var sidebar = document.getElementById("sidemenu");
+		sidebar.style.top = "50%";
+		docCookies.removeItem("hidemenu_cookie", "/");
+	}
+	function add_to_watch_list(symbol){
+		divSObj = document.getElementById("watch_symbol_title");
+		divSObj.innerHTML = "<p>Add " + symbol + " To My Watch List</p>";
+		divSIObj = document.getElementById("watch_symbol_input");
+		divSIObj.innerHTML = "<input type=hidden name=symbol_to_add value=" + symbol + ">";
+		$("#add_to_watch_list").dialog("open");
+	}
+	function topmenu_login_click (){
+		$("#topmenu_login").dialog("open");
+	}
+	function hide_top_message_box(){
+		var top_message_box_content = document.getElementById("top_message_box");
+		top_message_box_content.style.display = "None";
+	}
+</script>  
+
+
+
+
+
+
+
+
+ 
+</head> 
+<body>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<script>
+$('a').live('touchend', function(e) {
+    var el = $(this);
+    var link = el.attr('href');
+    window.location = link;
+});
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-49914255-1', 'optionslam.com');
+  ga('send', 'pageview');
+</script>
+
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KB8ZDG"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KB8ZDG');</script>
+<!-- End Google Tag Manager -->
+
+<div id="topmenu_login" title="Optionslam.com Login" style="display: none;">
+	<form method="post" action="/accounts/os_login/">
+	<input type="hidden" name="next" value="/earnings/excel/AGOV" />
+	    <input type="hidden" name="csrfmiddlewaretoken" value="EBIoEmGPVXhSXxeIEaJIeMgNnqjpnphvhAvxF0H78XYInKnBE5FQUMLtjTZUxGjN">
+	    <table border="0" align="center" cellpadding="1" cellspacing="0">
+		<tr>
+		<td>
+			<b>
+			<label for="id_username">Username/Email:</label>
+			</b>
+		</td>
+		<td>
+			<input id="id_username" type="text" name="username" maxlength="35" size="15"/>
+		</td>
+		</tr>
+		<tr>
+		<td>
+			<b>
+			<label for="id_password">Password:</label>
+			</b>
+		</td>
+		<td>
+			<input type="password" name="password" id="id_password" maxlength="35" size="15"/>
+		</td>
+		</tr>
+		<tr>
+		<td>&nbsp;</td>
+		<td><input type="image" src="/site_media/images/button_login.png" value="Log in" width="52" height="24" vspace="5" alt="log in" />
+		</td>
+		</tr>
+            <tr>
+                <td colspan="2">
+                    <p>Forgot password? <a href="/accounts/password/reset/">Reset it</a>!</p>
+                </td>
+            </tr>
+	    </table>
+	</form>
+</div>
+
+<div id="add_to_watch_list" title="Please Confirm" style="display: none;">
+	<center>
+	<div id=watch_symbol_title></div>
+	<p>
+	
+		 
+		<form method=post action="/account/mywatch_group/">
+		
+		<input type="hidden" name="csrfmiddlewaretoken" value="EBIoEmGPVXhSXxeIEaJIeMgNnqjpnphvhAvxF0H78XYInKnBE5FQUMLtjTZUxGjN">
+		<input type=hidden name=formtype value="watchlist_add">
+		<div id=watch_symbol_input></div>
+		<select name=add_group_id>
+			<option value="0">Default Watch List</option>
+			
+		</select>
+		<input type=submit name=submit value="Confirm">
+		</form>
+	
+	</center>
+</div>
+
+<table width="960" border="0" align="center" cellpadding="0" cellspacing="0">
+	<tr>  
+    <td rowspan=2>
+		
+		<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+		<td>
+		&nbsp;
+		<p class="shadow">
+		&nbsp;&nbsp;
+		Optionslam.com
+		<!--[if IE]><span>
+		&nbsp;&nbsp;
+		Optionslam.com</span>
+		<![endif]-->
+		</p>
+		</td>
+		<td valign=top>
+
+
+			&nbsp; &nbsp;
+		</td>
+		</tr>
+		</table>
+		
+	</td> 
+    <td rowspan=2>
+    </td>
+    <td align="right" valign=top colspan=2> 
+		<img src="/site_media/images/spacer.gif" width=400 height=5>
+		<form action="/earnings/stocks/" method="post">
+		<input type="hidden" name="csrfmiddlewaretoken" value="EBIoEmGPVXhSXxeIEaJIeMgNnqjpnphvhAvxF0H78XYInKnBE5FQUMLtjTZUxGjN">
+		<input name="stocks" type="text" value="Enter Symbol" size="20" onclick="clickclear(this, 'Enter Symbol')" />
+		<input type="submit" class="red-button" value="Go" />
+		</form>
+	</td> 
+	</tr> 
+	<tr>
+		<td align="right">
+			<div class="fb-like" data-href="http://www.facebook.com/optionslam" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false" data-font="segoe ui"></div>
+		</td>
+		<td align=right>
+			&nbsp;
+			&nbsp;
+			
+			<b><a href="/accounts/profile/">kyleong</a></b> &nbsp;
+			| <a href="/accounts/logout/">Log Out</a>
+			&nbsp;
+			&nbsp;
+			
+		</td>
+	</tr>
+ 
+	<tr style="background: url(/site_media/images/topnav_bg.gif);">
+	<td valign=middle colspan=10>
+
+	<table width=100% cellpadding=0 cellspacing=0>
+	<tr><td><img src="/site_media/images/spacer.gif" width=1 height=8></td></tr>
+	<tr><td>
+	<div id="navbar">
+	<!--[if IE]><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><![endif]--><!-- V6 Thu Jan 13 15:22:22 2011 -->
+	<ul id="nav" class="clearfix"> 
+	<li ><a title="Optionslam Home" href='/'>Home</a> 
+	</li> 
+	<li class="sep"><img src="/site_media/images/spacer.gif" width=1 height=8></li>
+	<li ><a title="Earnings Tools"  class='directory' name='Earnings' href="javascript:void()">Earnings</a>  
+		<ul>
+		<li ><a title="Earnings Calendar"  href='/tools/earnings/earning_today.html'>Earnings Calendar</a></li> 
+		<li ><a title="Stock Screener"  href='/research/earnings/earning_future.html'>Stock Screener (Upcoming Earnings)</a></li> 
+		<li ><a title="Weekly ATM Straddles" href="/tools/earnings/weekly.html">Imp. Move Weekly</a></li>
+		<li ><a title="Monthly ATM Straddles"  href='/tools/earnings/intheplay.html'>Imp. Move Monthly</a></li> 
+		</ul>
+	</li>
+	<li class="sep"><img src="/site_media/images/spacer.gif" width=1 height=8></li>
+	<li ><a title="Back Testing"  class='directory' href="javascript:void()">Back Testing</a>  
+		<ul>
+		<li ><a title="Earnings Historical Movements"  href='/research/earnings/past_earnings.html'>Historical Stock Screener</a> </li> 
+		<li ><a title="Options Back Testing"  name='Options Back Testing' href='/backtesting/option_combo_test'>OSBTT</a></li>
+		</ul>
+	</li>
+	<li class="sep"><img src="/site_media/images/spacer.gif" width=1 height=8></li>
+	<li ><a title="Webinars and Partners"  class='directory' name='Resources' href="javascript:void()">Resources</a>
+		<ul>
+			<li ><a title="Webinars"  href='/webinar/'>Optionslam Webinars</a></li> 
+			<li ><a title="Books"  href='/amazon'>Suggested Reading</a></li> 
+			<li ><a title="Partners"  href='/help/trusted_websites/'>Trusted Websites</a></li> 
+			<li ><a title="Learning"  href='/education/oic/'>Options Education</a></li> 
+			<li ><a title="Optionslam.com Facebook Page"  href='https://www.facebook.com/optionslam/'>Facebook Page</a></li> 
+		</ul>
+	</li>
+	<li class="sep"><img src="/site_media/images/spacer.gif" width=1 height=8></li>
+	<li ><a title="Site Help"  class='directory' name='HELP' href="javascript:void()">Help</a>  
+		<ul>
+		<li ><a title="About US"  href='/about/'>About Us</a> </li> 
+		<li ><a title="Join US"  name='Membership' href="/insider_member/">Membership Benefits</a> </li>
+
+		<li ><a title="List of Symbols"  href='/earnings/stock_list.html'>Symbol List</a> </li> 
+		<li ><a title="EVR Rating"  name='EVR' href="/help/track_rating/">EVR</a> </li>
+		<li ><a title="Earning Tools"  class='directory' name='Earning Tools' href="javascript:void()">Earnings</a>  
+			<ul>
+			<li ><a title="Earnings Calendar"  href='/help/earning_calendar/'>Earnings Calendar</a></li> 
+			<li ><a title="Upcoming Earnings"  href='/help/upcoming_earnings/'>Stock Screener</a></li> 
+			<li ><a title="Weekly ATM Straddles"  href='/help/weekly_options/'>Imp. Move Weekly</a></li> 
+			<li ><a title="Monthly ATM Straddles"  href='/help/earning_straddle/'>Imp. Move Monthly</a></li> 
+			</ul>
+		<li ><a title="Back Testing Tools"  class='directory' name='Back Testing' href="javascript:void()">Back Testing</a>  
+			<ul>
+			<li ><a title="Earnings History"  href='/help/earning_history/'>Historical Stock Screener</a></li> 
+			</ul>
+		<li ><a title="Stock Pages"  class='directory' name='Stock Charts' href="javascript:void()">Individual Stock Pages</a>  
+			<ul>
+			<li ><a title="Earnings History"  href='/help/chart_earning/'>Earnings History</a> </li> 
+			<li ><a title="Trend Analysis"  href='/help/chart_trending/'>Trend Analysis</a> </li> 
+			<li ><a title="Straddle History"  href='/help/chart_straddle/'>Imp. Move Monthly</a> </li>
+			<li ><a title="Weekly ATM Straddle"  href='/help/chart_weekly/'>Imp. Move Weekly</a> </li> 
+			<li ><a title="Post Earnings"  href='/help/post_earnings/'>Post Earnings</a> </li> 
+			</ul>
+		</li>  
+		<li ><a title="Member Services" name='Services' href="/help/services/">Email Alerts</a>  
+		</ul>
+	</li>
+	<li class="sep"><img src="/site_media/images/spacer.gif" width=1 height=8></li>
+	<li ><a title="Contact US"  name='Contact' href='/feedback.html'>Contact US</a>  
+	</li>
+    	
+	</ul>
+	</td>
+	<td>
+		<img src="/site_media/images/spacer.gif" width=1 height=30></td>
+	</td>
+	</tr>
+	</table>
+	</td>
+	</tr>
+
+	<tr class="subnav"> 
+		<td colspan="10"> 
+		<style type="text/css"> 
+			#home_subnav{
+				top: 0px;
+				left: 2px;
+				padding: 3px;
+				z-index: 2;
+			}
+		</style> 
+		<div id=home_subnav> 
+		  
+    <img src="/site_media/images/spacer.gif" width="54" height="1" /><strong>Research Tools:</strong>
+    &nbsp;&nbsp;&nbsp;
+    <img src="/site_media/images/yellowarrow.gif" />
+    <a href="/earnings/stock_list.html"><span class=subnav>Symbol Search</span></a>
+    &nbsp;&nbsp;&nbsp;
+    |
+    &nbsp;&nbsp;&nbsp;
+    <a href="/tools/earnings/earning_today.html"><span class=subnav>Earnings Calendar</span></a>
+    &nbsp;&nbsp;&nbsp;
+    |
+    &nbsp;&nbsp;&nbsp;
+    <a href="/research/earnings/earning_future.html"><span class=subnav>Upcoming Earnings</span></a>
+    &nbsp;&nbsp;&nbsp;
+    |
+    &nbsp;&nbsp;&nbsp;
+    <a href="/tools/earnings/weekly.html"><span class=subnav>Imp. Move Weekly</span></a>
+    &nbsp;&nbsp;&nbsp;
+    |
+    &nbsp;&nbsp;&nbsp;
+    <a href="/tools/earnings/intheplay.html"><span class=subnav>Imp. Move Monthly</span></a>
+    &nbsp;&nbsp;&nbsp;
+    |
+    &nbsp;&nbsp;&nbsp;
+    <a href="/tools/earnings/iv.html"><span class=subnav>Implied Move 7 Day</span></a>
+    &nbsp;&nbsp;&nbsp;
+
+		</div> 
+		</td>
+	</tr>
+	<tr class="navshadow"> 
+		<td colspan="10"><img src="/site_media/images/spacer.gif" width="1" height="15" /></td> 
+	</tr> 
+</table> 
+
+<table width="960" border="0" align="center" cellpadding="0" cellspacing="0"> 
+	<tr> 
+	<td width="15"><img src="/site_media/images/spacer.gif" width="15" height="15" /></td> 
+	<td width="930" valign="top"> 
+	<!-- Main Content Start -->    
+
+	  
+	
+
+<script language="javascript">
+	$(function() {
+		 $("#stock_info_popup").dialog({
+			autoOpen: false,
+			width: 460 
+		 });
+		$(document).scroll(function(e){
+			if ($(".ui-widget-overlay")) //the dialog has popped up in modal view
+			{
+			    //fix the overlay so it scrolls down with the page
+			    $(".ui-widget-overlay").css({
+				position: 'fixed',
+				top: '0'
+			    });
+
+			    //get the current popup position of the dialog box
+			    pos = $(".ui-dialog").position();
+
+			    //adjust the dialog box so that it scrolls as you scroll the page
+			    $(".ui-dialog").css({
+				position: 'fixed',
+				top: pos.y
+			    });
+			}
+		});
+	});
+	function stock_info_popup(name, symbol, market, star, total, date1, move1, move1D, close1, close1D, date2, move2, move2D, close2, close2D, date3, move3, move3D, close3, close3D, date4, move4, move4D, close4, close4D, market_cap_display, avg_volume, recent_close, weekly_straddle1, weekly_straddle2, weekly_straddle3, weekly_straddle4){
+		var market_symbol = market + ":" + symbol;
+		$("#stock_company_name").text(name);
+		$("#stock_company_market").text(market_symbol);
+		$("#stock_total_earnings").text(total);
+		var evr_text = "EVR: " + star;
+		$("#stock_earning_star").text(evr_text);
+		var move1_text = "";
+		if (move1D == 'U') {
+			move1_text = "" + move1 + "%" + "";
+			$("#stock_earning_move1").text(move1_text);
+			$("#stock_earning_move1").css('color', 'green');
+		}else{
+			move1_text = "-" + move1 + "%" + "";
+			$("#stock_earning_move1").text(move1_text);
+			$("#stock_earning_move1").css('color', 'red');
+		}
+		var close1_text = "";
+		if (close1D == 'U') {
+			close1_text = "" + close1 + "%" + "";
+			$("#stock_earning_close1").text(close1_text);
+			$("#stock_earning_close1").css('color', 'green');
+		}else{
+			close1_text = "-" + close1 + "%" + "";
+			$("#stock_earning_close1").text(close1_text);
+			$("#stock_earning_close1").css('color', 'red');
+		}
+
+		var move2_text = "";
+		if (move2D == 'U') {
+			move2_text = "" + move2 + "%" + "";
+			$("#stock_earning_move2").text(move2_text);
+			$("#stock_earning_move2").css('color', 'green');
+		}else{
+			move2_text = "-" + move2 + "%" + "";
+			$("#stock_earning_move2").text(move2_text);
+			$("#stock_earning_move2").css('color', 'red');
+		}
+		var close2_text = "";
+		if (close2D == 'U') {
+			close2_text = "" + close2 + "%" + "";
+			$("#stock_earning_close2").text(close2_text);
+			$("#stock_earning_close2").css('color', 'green');
+		}else{
+			close2_text = "-" + close2 + "%" + "";
+			$("#stock_earning_close2").text(close2_text);
+			$("#stock_earning_close2").css('color', 'red');
+		}
+
+		
+		var move3_text = "";
+		if (move3D == 'U') {
+			move3_text = "" + move3 + "%" + "";
+			$("#stock_earning_move3").text(move3_text);
+			$("#stock_earning_move3").css('color', 'green');
+		}else{
+			move3_text = "-" + move3 + "%" + "";
+			$("#stock_earning_move3").text(move3_text);
+			$("#stock_earning_move3").css('color', 'red');
+		}
+		var close3_text = "";
+		if (close3D == 'U') {
+			close3_text = "" + close3 + "%" + "";
+			$("#stock_earning_close3").text(close3_text);
+			$("#stock_earning_close3").css('color', 'green');
+		}else{
+			close3_text = "-" + close3 + "%" + "";
+			$("#stock_earning_close3").text(close3_text);
+			$("#stock_earning_close3").css('color', 'red');
+		}
+		var move4_text = "";
+		if (move4D == 'U') {
+			move4_text = "" + move4 + "%" + "";
+			$("#stock_earning_move4").text(move4_text);
+			$("#stock_earning_move4").css('color', 'green');
+		}else{
+			move4_text = "-" + move4 + "%" + "";
+			$("#stock_earning_move4").text(move4_text);
+			$("#stock_earning_move4").css('color', 'red');
+		}
+		var close4_text = "";
+		if (close4D == 'U') {
+			close4_text = "" + close4 + "%" + "";
+			$("#stock_earning_close4").text(close4_text);
+			$("#stock_earning_close4").css('color', 'green');
+		}else{
+			close4_text = "-" + close4 + "%" + "";
+			$("#stock_earning_close4").text(close4_text);
+			$("#stock_earning_close4").css('color', 'red');
+		}
+		
+
+		$("#stock_straddle_move1").text(weekly_straddle1 + "%");
+		$("#stock_straddle_move2").text(weekly_straddle2 + "%");
+		
+			$("#stock_straddle_move3").text(weekly_straddle3 + "%");
+			$("#stock_straddle_move4").text(weekly_straddle4 + "%");
+		
+
+		$("#stock_earning_date1").text(date1);
+		$("#stock_earning_date2").text(date2);
+		
+			$("#stock_earning_date3").text(date3);
+			$("#stock_earning_date4").text(date4);
+		
+
+		$("#stock_earning_watch_symbol").text(symbol);
+		$("#stock_market_cap").text(market_cap_display);
+		$("#stock_avg_volume").text(avg_volume);
+		$("#stock_recent_close").text(recent_close);
+
+	        watch_list_html = "<a href=javascript:add_to_watch_list('" + symbol + "')>Add To WatchList</a>\n";
+    		document.getElementById('stock_earning_footer').innerHTML = watch_list_html;
+
+		$("#stock_info_popup").dialog("open");
+	}
+</script>
+
+
+<div id="stock_info_popup" title="<div id=stock_company_name></div>" style="display: none;">
+	<table width=90%>
+	<tr>
+	<td colspan=2><font color=blue><div id=stock_company_market></div></font></td>
+	<td align=right><div id=stock_earning_star></div></td>
+	</tr>
+	</table>
+
+	<table>
+	<tr>
+	<td>Previous Close:</td><td><div id=stock_recent_close></div></td>
+	<td>&nbsp;&nbsp;</td>
+	<td>Market Cap:</td><td><div id=stock_market_cap></div></td>
+	<td>&nbsp;&nbsp;</td>
+	<td>Avg Volume:</td><td><div id=stock_avg_volume></div></td>
+	</tr>
+	</table>
+
+	<table>
+	<tr>
+	<th>Historical Earnings Events Available:</th><th><div id=stock_total_earnings></div></th>
+	</tr>
+	</table>
+
+	<table width=100% cellspacing=2 cellpadding=2>
+	<tr bgcolor=EEFFEE>
+	<td rowspan=2>Earnings Date</td>
+	<td></td>
+	<td colspan=5>One Day Price Change</td>
+	</tr>
+	<tr bgcolor=EEFFEE>
+	<td>&nbsp;</td>
+	<td>Expected</td>
+	<td>&nbsp;</td>
+	<td>Maximum</td>
+	<td>&nbsp;</td>
+	<td>At Close</td>
+	</tr>
+	<tr class="stockrow1">
+		<td><div id=stock_earning_date1>N/A</div></td>
+		<td></td>
+		<td><div id=stock_straddle_move1>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_move1>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_close1>N/A</div></td>
+	</tr>
+	<tr class="stockrow2">
+		<td><div id=stock_earning_date2>N/A</div></td>
+		<td></td>
+		<td><div id=stock_straddle_move2>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_move2>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_close2>N/A</div></td>
+	</tr>
+	 
+	<tr class="stockrow1">
+		<td><div id=stock_earning_date3>N/A</div></td>
+		<td></td>
+		<td><div id=stock_straddle_move3>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_move3>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_close3>N/A</div></td>
+	</tr>
+	<tr class="stockrow2">
+		<td><div id=stock_earning_date4>N/A</div></td>
+		<td></td>
+		<td><div id=stock_straddle_move4>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_move4>N/A</div></td>
+		<td></td>
+		<td><div id=stock_earning_close4>N/A</div></td>
+	</tr>
+	
+	</table>
+	<table width=100%>
+	<tr>
+	<th colspan=10>
+	<span id="stock_earning_footer"></span>
+	</th>
+	</tr>
+	</table>
+</div>
+
+
+<span class=title> 
+	Stock Symbol Search:
+</span> 
+
+<br> &nbsp; <br> 
+<table cellpadding=0 cellspacing=2 border=0 width=100%>
+	<tr>
+	<td bgcolor=CCCCCC>
+		<img src="/site_media/images/spacer.gif" width="100%" height="1" />
+	</td>
+	</tr>
+	<tr bgcolor=EEFFEE>
+	<td>
+	<img src="/site_media/images/spacer.gif" width="100%" height="5" />
+	<p class="helptext">This page allows you to begin your analysis by searching for stocks using our keyword search tool.  
+	<p>Alternatively, if you already know the ticker of your stock you can enter the symbol at the top right corner of this page next to the orange Go button. For your convenience the "Enter Symbol" field can be found at the top right corner of each and every page throughout OptionSlam.com.</p>
+	<p>Stocks offering options and weekly options are updated every month. </p>
+	</td>	
+	</tr>
+	<tr>
+	<td bgcolor=CCCCCC>
+		<img src="/site_media/images/spacer.gif" width="100%" height="1" />
+	</td>
+	</tr>
+</table>
+
+<br>
+
+<table cellspacing=2 cellpadding=0>
+<form method="POST">
+<input type="hidden" name="csrfmiddlewaretoken" value="EBIoEmGPVXhSXxeIEaJIeMgNnqjpnphvhAvxF0H78XYInKnBE5FQUMLtjTZUxGjN">
+<tr>
+<td> 
+	<label for="id_keyword">
+	Keyword Search:
+	</label>
+</td>
+<td>
+	
+</td>
+<td>
+	<label for="id_market_choice">
+	Market:
+	</label>
+</td>
+<td>
+	
+</td>
+</tr>
+
+<tr>
+<td colspan="20" align=center>
+
+	<input type="submit" name="action" class="red-button" value="Submit"/>
+	<br>
+
+</td>
+</tr>
+</form>
+</table>
+
+<br>
+<b>List Stocks by: </b>
+&nbsp;
+&nbsp;
+&nbsp;
+
+        <a href="/earnings/stock_list.html?list=A">A</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=B">B</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=C">C</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=D">D</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=E">E</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=F">F</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=G">G</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=H">H</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=I">I</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=J">J</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=K">K</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=L">L</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=M">M</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=N">N</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=O">O</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=P">P</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=Q">Q</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=R">R</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=S">S</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=T">T</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=U">U</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=V">V</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=W">W</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=X">X</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=Y">Y</a> &nbsp; | &nbsp;
+
+        <a href="/earnings/stock_list.html?list=Z">Z</a> &nbsp; | &nbsp;
+
+<br>
+
+
+	<h4> We are sorry. The symbol you entered is not valid. </h4>
+
+
+
+
+	
+	<!-- Main Content END -->    
+	</td> 
+ 
+	<td width="15"><img src="/site_media/images/spacer.gif" width="15" height="15" /></td> 
+	</tr> 
+</table> 
+ 
+<!-- Footer Start --> 
+<table width="960" border="0" align="center" cellpadding="0" cellspacing="0"> 
+	<tr> 
+		<td colspan="3">&nbsp;</td> 
+	</tr> 
+	<tr> 
+		<td colspan="3"><img src="/site_media/images/speck_grey.gif" width="960" height="1" /></td> 
+	</tr> 
+	<tr class="footer"> 
+		<td width="15"><img src="/site_media/images/spacer.gif" width="15" height="15" /></td> 
+		<td width="930" align="center"><br /> 
+		<br /> 
+		<a href="/about/" class="footer">About Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/help/sitemap/" class="footer">Site Map</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/backtesting/option_combo_test" class="footer">Strategy Testing</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/about/disclaim/" class="footer">Disclaimer</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/feedback.html" class="footer">Contact Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+		
+			
+				<a href="/help/member_cancel/" class="footer">Unsubscribe</a> <br /> 
+			
+		
+		<br /> 
+		Copyright &copy; 2003-2023 Optionslam.com LLC, All Rights Reserved. <b>(AWS10t)</b><br /> 
+		<br /> 
+		<br /> 
+		<br /></td> 
+		<td width="15"><img src="/site_media/images/spacer.gif" width="15" height="15" /></td> 
+	</tr> 
+</table> 
+
+
+<div id="sidemenu">
+<a href="" onClick="javascript:hide_sidemenu()" id="hide_menu_link">[hide]</a>
+<a href="" onClick="javascript:show_sidemenu()" id="show_menu_link" class="showmenu">[show]</a>
+<br>
+	<div id="sidemenu_list">
+
+
+	
+	<b>Email Alerts</b>
+	<li><a href="/account/myalert/">Stock Screener Alert</a> 
+	<li><a href="/account/mywatch/">My Watch List</a> 
+	<li><a href="/account/mystraddle/">Implied Price Move</a>
+
+	<br>&nbsp;<br>
+	<b>Back Testing</b>
+	<li><a href='/backtesting/option_combo_test'>OSBTT</a>
+	<br>&nbsp;<br>
+
+	<b>My Account</b>
+	<li><a href="/accounts/profile">My Profile</a> 
+	<li><a href="/feedback.html">Contact us</a>
+		
+		
+	<li><a href="/accounts/logout/">Log Out</a>
+	
+	</div>
+</div>
+  
+</body> 
+</body>
+</html>

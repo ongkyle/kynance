@@ -211,7 +211,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <div id="topmenu_login" title="Optionslam.com Login" style="display: none;">
 	<form method="post" action="/accounts/os_login/">
 	<input type="hidden" name="next" value="/earnings/excel/OTSKY" />
-	    <input type="hidden" name="csrfmiddlewaretoken" value="Nr0I2UbQg1TZeome9XL8OGmtigR8HlNau9RKR6ETPb2ZM88dy9U8yY9VzPuCnPFx">
+	    <input type="hidden" name="csrfmiddlewaretoken" value="fusybmrBR5cemYI2AQP0a4cpcSN7bTor43czhNBr36hoDnyFPcSW59PjcoGuHgWc">
 	    <table border="0" align="center" cellpadding="1" cellspacing="0">
 		<tr>
 		<td>
@@ -255,7 +255,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 		 
 		<form method=post action="/account/mywatch_group/">
 		
-		<input type="hidden" name="csrfmiddlewaretoken" value="Nr0I2UbQg1TZeome9XL8OGmtigR8HlNau9RKR6ETPb2ZM88dy9U8yY9VzPuCnPFx">
+		<input type="hidden" name="csrfmiddlewaretoken" value="fusybmrBR5cemYI2AQP0a4cpcSN7bTor43czhNBr36hoDnyFPcSW59PjcoGuHgWc">
 		<input type=hidden name=formtype value="watchlist_add">
 		<div id=watch_symbol_input></div>
 		<select name=add_group_id>
@@ -299,7 +299,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <td align="right" valign=top colspan=2> 
 		<img src="/site_media/images/spacer.gif" width=400 height=5>
 		<form action="/earnings/stocks/" method="post">
-		<input type="hidden" name="csrfmiddlewaretoken" value="Nr0I2UbQg1TZeome9XL8OGmtigR8HlNau9RKR6ETPb2ZM88dy9U8yY9VzPuCnPFx">
+		<input type="hidden" name="csrfmiddlewaretoken" value="fusybmrBR5cemYI2AQP0a4cpcSN7bTor43czhNBr36hoDnyFPcSW59PjcoGuHgWc">
 		<input name="stocks" type="text" value="Enter Symbol" size="20" onclick="clickclear(this, 'Enter Symbol')" />
 		<input type="submit" class="red-button" value="Go" />
 		</form>
@@ -720,7 +720,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <table cellspacing=2 cellpadding=0>
 <form method="POST">
-<input type="hidden" name="csrfmiddlewaretoken" value="Nr0I2UbQg1TZeome9XL8OGmtigR8HlNau9RKR6ETPb2ZM88dy9U8yY9VzPuCnPFx">
+<input type="hidden" name="csrfmiddlewaretoken" value="fusybmrBR5cemYI2AQP0a4cpcSN7bTor43czhNBr36hoDnyFPcSW59PjcoGuHgWc">
 <tr>
 <td> 
 	<label for="id_keyword">

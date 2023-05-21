@@ -1,4 +1,5 @@
 import argparser
+from cmds.download_all import DownloadAll
 from cmds.journal import Journal, JournalBackfill, JournalUpdate
 from cmds.many_ticker_report import ManyTickerReport
 from cmds.ticker_report import TickerReport
@@ -13,7 +14,9 @@ REQUIRED_ENV_VARS = {
     "--tickers": "TICKERS",
     "--optionslam-username": "OPTIONSLAM_USERNAME",
     "--optionslam-password": "OPTIONSLAM_PASSWORD",
-    "--journal-file-path": "JOURNAL_FILE_PATH"}
+    "--journal-file-path": "JOURNAL_FILE_PATH",
+    "--data-dir": "DATA_DIR"
+}
 
 PARSER_CONFIG = {
     "--file": {
@@ -110,7 +113,7 @@ PARSER_CONFIG = {
         "help": "option to update trading journal with latest entries",
         "dest": "do_journal"
     },
-    "--backfill": {
+    "--backfill-journal": {
         "required": False,
         "action": "store_true",
         "help": "option to backfill trading journal with all entries",
@@ -124,6 +127,31 @@ PARSER_CONFIG = {
         "default": DEFAULT_REQUIRES_ENV_VAR,
         "help": "absolute file location of journal.csv",
         "dest": "journal_file_path"
+    },
+    "--ignore": {
+        "default": [None],
+        "metavar": "i",
+        "type": str,
+        "required": False,
+        "action": "store",
+        "nargs": "*",
+        "help": "",
+        "dest": "ignore"
+    },
+    "--download-all": {
+        "required": False,
+        "action": "store_true",
+        "help": "option to download all historical earnings data",
+        "dest": "do_download"
+    },
+    "--data-dir": {
+        "metavar": "directory to store data",
+        "type": str,
+        "required": False,
+        "action": "store",
+        "default": DEFAULT_REQUIRES_ENV_VAR,
+        "help": "absolute data dir",
+        "dest": "data_dir"
     },
 }
 
@@ -155,26 +183,26 @@ def parse_args():
 
 
 def create_cmd(args):
-    if args.do_journal and (not args.do_journal_backfill):
+    if args.do_journal:
         return JournalUpdate(
             args.journal_file_path,
             args.rh_username,
             args.rh_password,
             args.rh_mfa
         )
-    elif args.do_journal and args.do_journal_backfill:
+    elif args.do_journal_backfill:
         return JournalBackfill(
             args.journal_file_path,
             args.rh_username,
             args.rh_password,
             args.rh_mfa
         )
-    elif not (args.do_report or args.do_journal):
+    elif not (args.do_report or args.do_journal or args.do_download):
         return TickerReport(args.tickers[0], args.days,
                             args.rh_username, args.rh_password,
                             args.rh_mfa, args.optionslam_username,
                             args.optionslam_password)
-    elif args.do_report & (not args.do_journal):
+    elif args.do_report:
         return ManyTickerReport(
             args.max_workers,
             args.tickers,
@@ -182,6 +210,16 @@ def create_cmd(args):
             args.rh_username, args.rh_password,
             args.rh_mfa, args.optionslam_username,
             args.optionslam_password
+        )
+    elif args.do_download:
+        return DownloadAll(
+            args.data_dir,
+            args.rh_username,
+            args.rh_password,
+            args.rh_mfa,
+            args.optionslam_username,
+            args.optionslam_password,
+            args.ignore
         )
 
 
