@@ -4,10 +4,8 @@ from strategies.statistics import ClosePercent, \
 
 
 class StatisticFactory(object):
-    def __init__(self, days, client_username, client_password, client_mfa):
-        self.client_username = client_username
-        self.client_password = client_password
-        self.client_mfa = client_mfa
+    def __init__(self, days, client):
+        self.client = client
         self.days = days
 
     def create(self, stat, file, ticker):
@@ -20,16 +18,14 @@ class StatisticFactory(object):
                 return MaxMedianMovement(stat.name, file, self.days)
             case Statistics.straddle_predicted_move:
                 return StraddlePredictedMovement(
-                    stat.name, file,
-                    self.client_username,
-                    self.client_password,
-                    self.client_mfa,
+                    stat.name,
+                    file,
+                    self.client,
                     ticker)
             case Statistics.profit_probability:
                 return ProfitProbability(
-                    stat.name, file,
-                    self.client_username,
-                    self.client_password,
-                    self.client_mfa,
+                    stat.name,
+                    file,
+                    self.client,
                     ticker
                 )

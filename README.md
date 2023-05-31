@@ -12,4 +12,4 @@ tools for automating options trading
 [ ] automatically write to a journal
     - [ ] how do i match opening a position with closing a position?
 [ ] figure out what to do about getting rate-limited by the rh api
-[ ] convert download_all.py into a cmd
+[x] convert download_all.py into a cmd

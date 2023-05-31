@@ -18,8 +18,8 @@ class TickerReport(Cmd):
         self.mfa = client_mfa
         self.optionslam_username = optionslam_username
         self.optionslam_password = optionslam_password
-        self.factory = StatisticFactory(days, client_username, client_password, client_mfa)
         self.client = Robinhood(username=self.username, password=self.password, mfa_code=self.mfa)
+        self.factory = StatisticFactory(days, self.client)
         self.validator = TickerValidator(self.ticker, client=self.client)
 
     def execute(self):

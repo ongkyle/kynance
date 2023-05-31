@@ -5,8 +5,8 @@ from itertools import islice
 
 import numpy as np
 
+from robinhood import Robinhood
 from cmd import Cmd
-from robinhood.robinhood import *
 from dataframe import *
 from scraper import Downloader
 from strategies.statistics import Statistics
@@ -25,8 +25,8 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         self.mfa = client_mfa
         self.optionslam_username = optionslam_username
         self.optionslam_password = optionslam_password
-        self.factory = StatisticFactory(days, client_username, client_password, client_mfa)
         self.client = Robinhood(username=self.username, password=self.password, mfa_code=self.mfa)
+        self.factory = StatisticFactory(days, self.client)
 
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
@@ -38,8 +38,8 @@ class ManyTickerReport(Cmd, ValidatorMixin):
                                                           valid_tickers)
         data = self.resolve_futures(future_to_symbol)
         df = pd.DataFrame.from_dict(data)
-
         df = self.reorder_cols(df)
+
         print(df)
 
     @staticmethod

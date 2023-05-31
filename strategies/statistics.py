@@ -20,10 +20,10 @@ class Statistic(Dataframe):
 
 
 class RhStatistic(Statistic):
-    def __init__(self, stat_name, csv_file, username, password, mfa_code, ticker, **kwargs):
+    def __init__(self, stat_name, csv_file, client, ticker, **kwargs):
         super().__init__(stat_name=stat_name, csv_file=csv_file)
         self.ticker = ticker
-        self.rh = Robinhood(username=username, password=password, mfa_code=mfa_code)
+        self.client = client
 
 
 class ClosePercent(Statistic, Strategy):
@@ -97,7 +97,7 @@ class MaxMedianMovement(Statistic, Strategy):
 class StraddlePredictedMovement(RhStatistic, Strategy):
 
     def execute(self):
-        straddle_predicted_movement = self.rh.get_straddle_predicted_movement(self.ticker)
+        straddle_predicted_movement = self.client.get_straddle_predicted_movement(self.ticker)
         return self.title, pd.Series(straddle_predicted_movement, index=[self.df.shape[0] - 1])
 
     @property
@@ -107,9 +107,6 @@ class StraddlePredictedMovement(RhStatistic, Strategy):
 
 class ProfitProbability(RhStatistic, Strategy):
 
-    def get_previous_moves(self):
-        raise NotImplementedError()
-
     def execute(self):
         return self.title, self.calculate_profit_probability()
 
@@ -118,6 +115,8 @@ class ProfitProbability(RhStatistic, Strategy):
         if num_earnings <= 0:
             return pd.Series(0)
         straddle_predicted_movement = self.get_straddle_predicted_movement()
+        if straddle_predicted_movement.all(None):
+            return pd.Series(None, index=[self.df.shape[0] - 1])
         max_moves = self.get_max_moves()
         comparison = straddle_predicted_movement.values < max_moves.abs().values
         probability = (comparison.sum() / num_earnings) * 100
@@ -126,7 +125,7 @@ class ProfitProbability(RhStatistic, Strategy):
 
     def get_straddle_predicted_movement(self):
         num_earnings = self.df.shape[0]
-        straddle_predicted_movement = self.rh.get_straddle_predicted_movement(self.ticker)
+        straddle_predicted_movement = self.client.get_straddle_predicted_movement(self.ticker)
         straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(num_earnings))
         return straddle_predicted_movement
 
@@ -136,15 +135,3 @@ class ProfitProbability(RhStatistic, Strategy):
     @property
     def title(self):
         return f"{self.stat_name} %"
-
-
-class UpwardsProfitProbability(ProfitProbability):
-
-    def get_previous_moves(self):
-        return self.df["One Day High"]
-
-
-class DownwardsProfitProbability(ProfitProbability):
-
-    def get_previous_moves(self):
-        return self.df["One Day Low"]
