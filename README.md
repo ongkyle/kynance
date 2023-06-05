@@ -12,7 +12,8 @@ tools for automating options trading
 [ ] automatically write to a journal
     - [ ] how do i match opening a position with closing a position?
 [ ] figure out what to do about getting rate-limited by the rh api
-[ ] what to do about DECRYPTION_FAILED_OR_BAD_RECORD_MAC errors due to @timeout
+[x] what to do about DECRYPTION_FAILED_OR_BAD_RECORD_MAC errors due to @timeout
+    - switched to the y_finance --data-source which removed the need to "timeout" when the right strike price couldn't be found using the rh api
 [x] convert download_all.py into a cmd
 [ ] logging
 [ ] optimize hitting yahoo finance, robinhood api.
