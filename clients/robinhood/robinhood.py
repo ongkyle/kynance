@@ -10,18 +10,16 @@ import robin_stocks.robinhood as rh
 from wrapt_timeout_decorator import *
 
 from clients.yfinance import YFinance
+from clients.client import ValidationClient
 
-
-class Robinhood(object):
+class RobinhoodBase(object):
     def __init__(self, username=None, password=None, mfa_code=None, concurrency_limit=2):
-        print ("asdfasdffad")
         self.username = username
         self.password = password
         self.mfa_code = mfa_code
         self._finalize = weakref.finalize(self, self.logout)
         self.login()
-        self.semaphore = Semaphore(concurrency_limit)
-
+    
     def __enter__(self):
         return self
 
@@ -40,6 +38,22 @@ class Robinhood(object):
             rh.logout()
         except Exception as _:
             pass
+
+
+class RobinhoodValidation(ValidationClient, RobinhoodBase):
+
+    def exists(self, ticker):
+        name = rh.get_name_by_symbol(ticker)
+        return name != ""
+
+    def supports_options(self, ticker):
+        sleep(1 + random.randint(1, 3))
+        res = rh.get_chains(symbol=ticker, info="expiration_dates")
+        print(f"get_options_chain: {res}")
+        return res
+
+
+class Robinhood(RobinhoodBase):
 
     def filter(self, data, info):
         return rh.filter_data(data, info)

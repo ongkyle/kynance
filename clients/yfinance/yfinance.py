@@ -3,7 +3,30 @@ from datetime import date, datetime
 import numpy as np
 import pandas as pd
 
+from clients.client import ValidationClient
 import yfinance
+
+class YFinanceValidation(ValidationClient, object):
+    def exists(self, ticker):
+        ticker = yfinance.Ticker(ticker=ticker)
+        does_exist = True
+        try:
+            ticker.info
+        except HTTPError as err:
+            print(err)
+            does_exist = False
+        return does_exist   
+
+    def supports_options(self, ticker):
+        ticker = yfinance.Ticker(ticker=ticker)
+        supports_options = True
+        try:
+            ticker.option_chain()
+        except TypeError as err:
+            print(err)
+            supports_options = False 
+        return supports_options
+
 
 class YFinance(object):
     def __init__(self, ticker):
@@ -19,7 +42,7 @@ class YFinance(object):
         except HTTPError as err:
             print(err)
             does_exist = False
-        return does_exist
+        return does_exist        
     
     def get_chain_just_after_earnings(self):
         next_earnings_date = self.get_next_earnings_date()
@@ -61,11 +84,8 @@ class YFinance(object):
         earnings = self.ticker.get_earnings_dates()
         return earnings.index.values
     
-    def get_option_chain(self, expiration_date=None, ticker=None):
-        to_fetch = self.ticker
-        if ticker:
-            to_fetch=yfinance.Ticker(ticker=ticker)
-        return to_fetch.option_chain(expiration_date)
+    def get_option_chain(self, expiration_date=None):
+        return self.ticker.option_chain(expiration_date)
     
     def get_put_option_chain(self, expiration_date):
         return self.get_option_chain(expiration_date=expiration_date).puts

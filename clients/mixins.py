@@ -5,7 +5,9 @@ from .yfinance import YFinance
 
 class Clients(Enum):
     y_finance = 0
-    robinhood = 1
+    y_finance_validation = 1
+    robinhood = 2
+    robinhood_validation = 3
 
 class ClientFactory(object):
     def __init__(self, username, password, mfa_code):

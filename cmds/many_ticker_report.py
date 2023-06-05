@@ -16,7 +16,8 @@ from clients.mixins import create_client, Clients
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
-    def __init__(self, max_workers, tickers, days, client_username, client_password, client_mfa, optionslam_username,
+    def __init__(self, max_workers, tickers, days, client_username, 
+                 client_password, client_mfa, optionslam_username,
                  optionslam_password):
         self.max_workers = max_workers
         self.ticker = tickers
@@ -55,15 +56,16 @@ class ManyTickerReport(Cmd, ValidatorMixin):
     def filter_valid_tickers(self, tickers):
         valid_tickers = []
         print (self.max_workers)
+        validation_client = create_client(client_type=Clients.y_finance_validation)
         for idx, ticker in enumerate(tickers):
             destination_dir = f"{os.getcwd()}/data/{ticker}/"
             destination_file = os.path.join(destination_dir, "earnings.csv")
             self.download_if_necessary(ticker, destination_file)
 
             try:
-                self.validate_ticker(ticker, self.yf_client)
+                self.validate_ticker(ticker, validation_client)
                 self.validate_data(destination_file)
-                self.validate_options(ticker, self.yf_client)
+                self.validate_options(ticker, self.validation_client)
             except Exception as e:
                 print(e)
                 continue
