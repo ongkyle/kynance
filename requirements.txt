@@ -4,3 +4,8 @@ requests~=2.30.0
 beautifulsoup4~=4.12.2
 numpy~=1.24.3
 wrapt_timeout_decorator
+robin_stocks
+jinja2
+investpy
+jupyter
+yfinance

@@ -46,7 +46,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from cmds.cmd import Cmd
-from robinhood.robinhood import Robinhood
+from clients import Robinhood
 
 
 class OptionStrategy(Enum):

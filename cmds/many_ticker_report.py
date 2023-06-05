@@ -5,13 +5,14 @@ from itertools import islice
 
 import numpy as np
 
-from robinhood import Robinhood
+from clients import *
 from cmd import Cmd
 from dataframe import *
 from scraper import Downloader
 from strategies.statistics import Statistics
 from strategies.mixins import StatisticFactory
 from validators.mixins import ValidatorMixin
+from clients.mixins import create_client, Clients
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
@@ -20,13 +21,15 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         self.max_workers = max_workers
         self.ticker = tickers
         self.days = days
-        self.username = client_username
-        self.password = client_password
-        self.mfa = client_mfa
         self.optionslam_username = optionslam_username
         self.optionslam_password = optionslam_password
-        self.client = Robinhood(username=self.username, password=self.password, mfa_code=self.mfa)
-        self.factory = StatisticFactory(days, self.client)
+        self.yf_client = create_client(client_type=Clients.y_finance,
+                                       ticker=tickers)
+        self.rh_client = create_client(client_type=Clients.robinhood, 
+                                       username=client_username,
+                                       password=client_password, 
+                                       mfa_code=client_mfa)
+        self.stat_factory = StatisticFactory(days, self.yf_client)
 
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
@@ -58,9 +61,9 @@ class ManyTickerReport(Cmd, ValidatorMixin):
             self.download_if_necessary(ticker, destination_file)
 
             try:
-                self.validate_ticker(ticker, self.client)
+                self.validate_ticker(ticker, self.yf_client)
                 self.validate_data(destination_file)
-                self.validate_options(ticker, self.client)
+                self.validate_options(ticker, self.yf_client)
             except Exception as e:
                 print(e)
                 continue
@@ -130,7 +133,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         next(islice(seq, 1, None), None)
 
     def get_upcoming_earnings_tickers(self):
-        tickers = self.client.get_upcoming_earnings_tickers()
+        tickers = self.rh_client.get_upcoming_earnings_tickers()
         return deque(tickers)
 
     def download_if_necessary(self, ticker, file):
@@ -168,4 +171,4 @@ class ManyTickerReport(Cmd, ValidatorMixin):
             d.download(file)
 
     def create_statistic(self, statistic, file, ticker):
-        return self.factory.create(statistic, file, ticker)
+        return self.stat_factory.create(statistic, file, ticker)

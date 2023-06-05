@@ -15,7 +15,8 @@ REQUIRED_ENV_VARS = {
     "--optionslam-username": "OPTIONSLAM_USERNAME",
     "--optionslam-password": "OPTIONSLAM_PASSWORD",
     "--journal-file-path": "JOURNAL_FILE_PATH",
-    "--data-dir": "DATA_DIR"
+    "--data-dir": "DATA_DIR",
+    "--data-source": "DEFAULT_CLIENT"
 }
 
 PARSER_CONFIG = {
@@ -153,6 +154,16 @@ PARSER_CONFIG = {
         "help": "absolute data dir",
         "dest": "data_dir"
     },
+    "--data-source": {
+        "metavar": "which datasource to use",
+        "type": str,
+        "required": False,
+        "action": "store",
+        "default": DEFAULT_REQUIRES_ENV_VAR,
+        "help": "available datasources include: 'robinhood' or 'y_finance'",
+        "dest": "client",
+        "choices": ["robinhood", "y_finance"]
+    }
 }
 
 
@@ -201,7 +212,7 @@ def create_cmd(args):
         return TickerReport(args.tickers[0], args.days,
                             args.rh_username, args.rh_password,
                             args.rh_mfa, args.optionslam_username,
-                            args.optionslam_password)
+                            args.optionslam_password, args.client)
     elif args.do_report:
         return ManyTickerReport(
             args.max_workers,
@@ -219,7 +230,8 @@ def create_cmd(args):
             args.rh_mfa,
             args.optionslam_username,
             args.optionslam_password,
-            args.ignore
+            args.ignore,
+            args.client
         )
 
 

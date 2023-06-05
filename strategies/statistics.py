@@ -1,7 +1,7 @@
 import pandas as pd
 from enum import Enum
 from dataframe import Dataframe
-from robinhood.robinhood import *
+from clients import Robinhood
 from strategies.strategy import Strategy
 
 
@@ -97,7 +97,7 @@ class MaxMedianMovement(Statistic, Strategy):
 class StraddlePredictedMovement(RhStatistic, Strategy):
 
     def execute(self):
-        straddle_predicted_movement = self.client.get_straddle_predicted_movement(self.ticker)
+        straddle_predicted_movement = self.client.get_straddle_predicted_movement()
         return self.title, pd.Series(straddle_predicted_movement, index=[self.df.shape[0] - 1])
 
     @property
@@ -115,8 +115,10 @@ class ProfitProbability(RhStatistic, Strategy):
         if num_earnings <= 0:
             return pd.Series(0)
         straddle_predicted_movement = self.get_straddle_predicted_movement()
-        if straddle_predicted_movement.all(None):
-            return pd.Series(None, index=[self.df.shape[0] - 1])
+        if straddle_predicted_movement.isnull().all():
+            profit_probability = pd.Series(None, index=[self.df.shape[0] - 1])
+            print(f"calculate_profit_probability: {self.ticker} {profit_probability}")
+            return profit_probability
         max_moves = self.get_max_moves()
         comparison = straddle_predicted_movement.values < max_moves.abs().values
         probability = (comparison.sum() / num_earnings) * 100
@@ -125,8 +127,10 @@ class ProfitProbability(RhStatistic, Strategy):
 
     def get_straddle_predicted_movement(self):
         num_earnings = self.df.shape[0]
-        straddle_predicted_movement = self.client.get_straddle_predicted_movement(self.ticker)
+        straddle_predicted_movement = self.client.get_straddle_predicted_movement()
+        print (f"get_straddle_predicted_movement: {self.ticker} {straddle_predicted_movement}")
         straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(num_earnings))
+        print (f"get_straddle_predicted_movement: {self.ticker} {straddle_predicted_movement}")
         return straddle_predicted_movement
 
     def get_max_moves(self):

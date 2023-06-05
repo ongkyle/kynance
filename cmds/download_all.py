@@ -1,4 +1,4 @@
-from robinhood.robinhood import *
+from clients import *
 from env import *
 from scraper import Downloader
 import concurrent.futures

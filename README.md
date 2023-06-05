@@ -12,4 +12,9 @@ tools for automating options trading
 [ ] automatically write to a journal
     - [ ] how do i match opening a position with closing a position?
 [ ] figure out what to do about getting rate-limited by the rh api
+[ ] what to do about DECRYPTION_FAILED_OR_BAD_RECORD_MAC errors due to @timeout
 [x] convert download_all.py into a cmd
+[ ] logging
+[ ] optimize hitting yahoo finance, robinhood api.
+[ ] makefile
+[ ] use rh to get tickers of interest, download all of them at once with yf.download
