@@ -2,6 +2,7 @@ import concurrent.futures
 import os
 from collections import deque
 from itertools import islice
+from typing import List
 
 import numpy as np
 
@@ -12,7 +13,7 @@ from scraper import Downloader
 from strategies.statistics import Statistics
 from strategies.mixins import StatisticFactory
 from validators.mixins import ValidatorMixin
-from clients.mixins import create_client, Clients
+from clients.mixins import create_client, create_rh_client, Clients
 
 
 class ManyTickerReport(Cmd, ValidatorMixin):
@@ -24,13 +25,10 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         self.days = days
         self.optionslam_username = optionslam_username
         self.optionslam_password = optionslam_password
-        self.yf_client = create_client(client_type=Clients.y_finance,
-                                       ticker=tickers)
-        self.rh_client = create_client(client_type=Clients.robinhood, 
-                                       username=client_username,
-                                       password=client_password, 
-                                       mfa_code=client_mfa)
-        self.stat_factory = StatisticFactory(days, self.yf_client)
+        self.rh_client = create_rh_client(username=client_username,
+                                          password=client_password, 
+                                          mfa_code=client_mfa)
+        self.stat_factory = StatisticFactory(days)
 
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
@@ -44,7 +42,7 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         df = pd.DataFrame.from_dict(data)
         df = self.reorder_cols(df)
 
-        print(df)
+        print(df.sort_values("profit_probability %", ascending=False))
 
     @staticmethod
     def reorder_cols(df):
@@ -53,24 +51,28 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         df = df[cols]
         return df
 
-    def filter_valid_tickers(self, tickers):
+    def filter_valid_tickers(self, tickers: List[str]):
         valid_tickers = []
         print (self.max_workers)
         validation_client = create_client(client_type=Clients.y_finance_validation)
-        for idx, ticker in enumerate(tickers):
+        for ticker in tickers:
             destination_dir = f"{os.getcwd()}/data/{ticker}/"
             destination_file = os.path.join(destination_dir, "earnings.csv")
             self.download_if_necessary(ticker, destination_file)
 
             try:
-                self.validate_ticker(ticker, validation_client)
-                self.validate_data(destination_file)
-                self.validate_options(ticker, self.validation_client)
+                self.validate(
+                    ticker=ticker,
+                    client=validation_client,
+                    file=destination_dir,
+                )
             except Exception as e:
                 print(e)
                 continue
 
             valid_tickers.append(ticker)
+        
+        print (f"filter_valid_tickers: {valid_tickers}")
 
         return valid_tickers
 
@@ -99,7 +101,11 @@ class ManyTickerReport(Cmd, ValidatorMixin):
         return data
 
     def get_next_earning_date(self, ticker):
-        return self.client.get_next_earnings_date(ticker)
+        client = create_client(
+            client_type=Clients.y_finance,
+            ticker=ticker
+        )
+        return client.get_next_earnings_date()
 
     @staticmethod
     def submit_fn_to_executor(executor, fn, tickers):
@@ -172,5 +178,11 @@ class ManyTickerReport(Cmd, ValidatorMixin):
                         headers=headers) as d:
             d.download(file)
 
-    def create_statistic(self, statistic, file, ticker):
-        return self.stat_factory.create(statistic, file, ticker)
+    def create_statistic(self, statistic: Statistics, file: str, ticker: str):
+        client = create_client(client_type=Clients.y_finance, ticker=ticker)
+        return self.stat_factory.create(
+            stat=statistic,
+            file=file,
+            ticker=ticker,
+            client=client
+        )

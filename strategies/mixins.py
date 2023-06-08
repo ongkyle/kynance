@@ -1,31 +1,48 @@
 from strategies.statistics import ClosePercent, \
     MaxMeanMovement, MaxMedianMovement, \
-    StraddlePredictedMovement, ProfitProbability, Statistics
+    StraddlePredictedMovement, ProfitProbability, \
+    Statistics, Statistic
+
+from clients.client import OptionsClient
 
 
 class StatisticFactory(object):
-    def __init__(self, days, client):
-        self.client = client
+    def __init__(self, days: int):
         self.days = days
 
-    def create(self, stat, file, ticker):
+    def create(self, stat: Statistics, file: str, ticker: str, client: OptionsClient) -> Statistic:
         match stat:
             case Statistics.close_percent:
-                return ClosePercent(stat.name, file)
+                return ClosePercent(
+                    stat_name=stat.name,
+                    csv_file=file,
+                    days=self.days
+                )
             case Statistics.max_mean:
-                return MaxMeanMovement(stat.name, file, self.days)
+                return MaxMeanMovement(
+                    stat_name=stat.name,
+                    csv_file=file,
+                    days=self.days
+                )
             case Statistics.max_median:
-                return MaxMedianMovement(stat.name, file, self.days)
+                return MaxMedianMovement(
+                    stat_name=stat.name,
+                    csv_file=file,
+                    days=self.days
+                )
             case Statistics.straddle_predicted_move:
                 return StraddlePredictedMovement(
-                    stat.name,
-                    file,
-                    self.client,
-                    ticker)
+                    stat_name=stat.name,
+                    csv_file=file,
+                    client=client,
+                    ticker=ticker,
+                    days=self.days
+                )
             case Statistics.profit_probability:
                 return ProfitProbability(
-                    stat.name,
-                    file,
-                    self.client,
-                    ticker
+                    stat_name=stat.name,
+                    csv_file=file,
+                    client=client,
+                    ticker=ticker,
+                    days=self.days
                 )

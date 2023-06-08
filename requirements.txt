@@ -9,3 +9,6 @@ jinja2
 investpy
 jupyter
 yfinance
+requests_cache
+requests_ratelimiter
+pyrate_limiter

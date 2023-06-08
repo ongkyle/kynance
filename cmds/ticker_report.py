@@ -1,15 +1,16 @@
 import os
+import sys
 from cmd import Cmd
 from clients import *
 from dataframe import *
 from scraper import Downloader
-from validators.validators import InvalidTickerException, TickerValidator
 from strategies.statistics import Statistics
 from strategies.mixins import StatisticFactory
-from clients.mixins import create_client
+from clients.mixins import create_client, create_yf_validation_client
+from validators.mixins import ValidatorMixin
 
 
-class TickerReport(Cmd):
+class TickerReport(Cmd, ValidatorMixin):
     def __init__(self, ticker, days, client_username, client_password, 
                  client_mfa, optionslam_username, optionslam_password,
                  client_type):
@@ -19,26 +20,29 @@ class TickerReport(Cmd):
         self.optionslam_password = optionslam_password
         self.client = create_client(client_type=client_type, username=client_username, 
                                     password=client_password, mfa_code=client_mfa, ticker=ticker)
-        self.stat_factory = StatisticFactory(days, self.client)
+        self.stat_factory = StatisticFactory(days)
 
     def execute(self):
-        self.validate_ticker()
 
         destination_dir = f"{os.getcwd()}/data/{self.ticker}/"
         destination_file = os.path.join(destination_dir, "earnings.csv")
+
+        validation_client = create_yf_validation_client()
+        try:
+            self.validate(
+                ticker=self.ticker,
+                client=validation_client,
+                file=destination_file
+            )
+        except Exception as e:
+            print(e)
+            sys.exit(1)
 
         self.download(destination_file)
 
         df = Dataframe(destination_file, display_cols=["Earning Date", "Max Move"])
 
         self.show_statistics(df, destination_file)
-
-    def validate_ticker(self):
-        validator = TickerValidator(ticker=self.ticker, client=self.client)
-        try:
-            validator.validate()
-        except InvalidTickerException as e:
-            raise e
 
     def download(self, file):
 
@@ -81,5 +85,8 @@ class TickerReport(Cmd):
             df[title] = stat
         df.print(titles)
 
-    def create_statistic(self, statistic, file):
-        return self.stat_factory.create(statistic, file, self.ticker)
+    def create_statistic(self, statistic: Statistics, file: str):
+        return self.stat_factory.create(stat=statistic,
+                                        file=file,
+                                        ticker=self.ticker,
+                                        client=self.client)

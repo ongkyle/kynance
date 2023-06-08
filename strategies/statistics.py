@@ -1,7 +1,6 @@
 import pandas as pd
 from enum import Enum
 from dataframe import Dataframe
-from clients import Robinhood
 from strategies.strategy import Strategy
 
 
@@ -14,14 +13,40 @@ class Statistics(Enum):
 
 
 class Statistic(Dataframe):
-    def __init__(self, stat_name, csv_file, **kwargs):
+    def __init__(self, stat_name, csv_file, days, **kwargs):
         super().__init__(csv_file=csv_file)
         self.stat_name = stat_name
+        self.days = days
+    
+    def num_days_to_calculate(self) -> int:
+        num_earnings = self.num_earnings
+        if self.days >= num_earnings:
+            print (f"num_days_to_calculate: {num_earnings}")
+            return num_earnings
+        print (f"num_days_to_calculate: {num_earnings - self.days }")
+        return num_earnings - self.days
+    
+    def get_window_length(self) -> int:
+        if self.days >= self.num_earnings:
+            return self.num_earnings
+        return self.days
+    
+    def get_index(self) -> list[int]:
+        idx = [idx for idx in range(self.num_earnings - 1, self.days - 1, -1)]
+        if self.days >= self.num_earnings:
+            idx = [idx for idx in range(self.num_earnings - 1, -1, -1)]
+        print(f"get_index: {idx}")
+        return idx
+        
+    
+    @property
+    def num_earnings(self) -> int:
+        return self.df.shape[0]
 
 
 class RhStatistic(Statistic):
     def __init__(self, stat_name, csv_file, client, ticker, **kwargs):
-        super().__init__(stat_name=stat_name, csv_file=csv_file)
+        super().__init__(stat_name=stat_name, csv_file=csv_file, **kwargs)
         self.ticker = ticker
         self.client = client
 
@@ -44,7 +69,7 @@ class ClosePercent(Statistic, Strategy):
 
 class MaxMeanMovement(Statistic, Strategy):
     def __init__(self, stat_name, csv_file, days):
-        super().__init__(stat_name=stat_name, csv_file=csv_file)
+        super().__init__(stat_name=stat_name, csv_file=csv_file, days=days)
         self.stat_name = stat_name
         self.days = days
 
@@ -53,24 +78,25 @@ class MaxMeanMovement(Statistic, Strategy):
 
     @property
     def title(self):
-        return f"{self.days} day {self.stat_name} %"
+        return f"n day {self.stat_name} %"
 
     def calculate_historical_max_mean_movement(self):
         historical_max_means = []
-        num_earnings = self.df.shape[0]
-        num_earnings_with_days_observations = num_earnings - self.days
+        days_to_calculate = self.num_days_to_calculate()
+        print (f"calculate_historical_max_mean_movement: {days_to_calculate}")
 
-        for i in range(0, num_earnings_with_days_observations):
-            window = self.df["Max Move"][i:self.days + i].abs()
+        for i in range(0, days_to_calculate):
+            window = self.df["Max Move"].iloc[i:days_to_calculate + i].abs()
+            print (f"calculate_historical_max_mean_movement: {window} {window.mean()}")
             historical_max_means.append(window.mean())
 
-        return self.title, pd.Series(historical_max_means,
-                                     index=[idx for idx in range(num_earnings - 1, self.days - 1, -1)])
+        idx = self.get_index()
+        return self.title, pd.Series(historical_max_means, index=idx)
 
 
 class MaxMedianMovement(Statistic, Strategy):
     def __init__(self, stat_name, csv_file, days):
-        super().__init__(stat_name=stat_name, csv_file=csv_file)
+        super().__init__(stat_name=stat_name, csv_file=csv_file, days=days)
         self.stat_name = stat_name
         self.days = days
 
@@ -79,19 +105,18 @@ class MaxMedianMovement(Statistic, Strategy):
 
     @property
     def title(self):
-        return f"{self.days} day {self.stat_name} %"
+        return f"n day {self.stat_name} %"
 
     def calculate_historical_max_median_movement(self):
         historical_max_medians = []
-        num_earnings = self.df.shape[0]
-        num_earnings_with_days_observations = num_earnings - self.days
+        days_to_calculate = self.num_days_to_calculate()
 
-        for i in range(0, num_earnings_with_days_observations):
-            window = self.df["Max Move"][i:self.days + i].abs()
+        for i in range(0, days_to_calculate):
+            window = self.df["Max Move"].iloc[i:days_to_calculate + i].abs()
             historical_max_medians.append(window.median())
 
-        return self.title, pd.Series(historical_max_medians,
-                                     index=[idx for idx in range(num_earnings - 1, self.days - 1, -1)])
+        idx = self.get_index()
+        return self.title, pd.Series(historical_max_medians, index=idx)
 
 
 class StraddlePredictedMovement(RhStatistic, Strategy):
@@ -111,8 +136,8 @@ class ProfitProbability(RhStatistic, Strategy):
         return self.title, self.calculate_profit_probability()
 
     def calculate_profit_probability(self):
-        num_earnings = self.df.shape[0]
-        if num_earnings <= 0:
+        window_length = self.get_window_length()
+        if window_length <= 0:
             return pd.Series(0)
         straddle_predicted_movement = self.get_straddle_predicted_movement()
         if straddle_predicted_movement.isnull().all():
@@ -121,20 +146,21 @@ class ProfitProbability(RhStatistic, Strategy):
             return profit_probability
         max_moves = self.get_max_moves()
         comparison = straddle_predicted_movement.values < max_moves.abs().values
-        probability = (comparison.sum() / num_earnings) * 100
+        probability = (comparison.sum() / window_length) * 100
         probability = round(probability, 2)
+        probability = str(f"{probability}% ({comparison.sum()}/{window_length})")
         return pd.Series(probability, index=[self.df.shape[0] - 1])
 
     def get_straddle_predicted_movement(self):
-        num_earnings = self.df.shape[0]
+        window_length = self.get_window_length()
         straddle_predicted_movement = self.client.get_straddle_predicted_movement()
         print (f"get_straddle_predicted_movement: {self.ticker} {straddle_predicted_movement}")
-        straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(num_earnings))
+        straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(window_length))
         print (f"get_straddle_predicted_movement: {self.ticker} {straddle_predicted_movement}")
         return straddle_predicted_movement
 
     def get_max_moves(self):
-        return self.df["Max Move"]
+        return self.df["Max Move"].iloc[0:self.get_window_length()]
 
     @property
     def title(self):

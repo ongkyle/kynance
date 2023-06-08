@@ -10,7 +10,7 @@ import robin_stocks.robinhood as rh
 from wrapt_timeout_decorator import *
 
 from clients.yfinance import YFinance
-from clients.client import ValidationClient
+from clients.client import ValidationClient, OptionsClient
 
 class RobinhoodBase(object):
     def __init__(self, username=None, password=None, mfa_code=None, concurrency_limit=2):
@@ -53,7 +53,7 @@ class RobinhoodValidation(ValidationClient, RobinhoodBase):
         return res
 
 
-class Robinhood(RobinhoodBase):
+class Robinhood(OptionsClient, RobinhoodBase):
 
     def filter(self, data, info):
         return rh.filter_data(data, info)
