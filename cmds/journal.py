@@ -47,6 +47,10 @@ from pandas import DataFrame
 
 from cmds.cmd import Cmd
 from clients import Robinhood
+from log.mixins import LoggingMixin
+from log.metaclass import MethodLoggerMeta
+
+__metaclass__ = MethodLoggerMeta
 
 
 class OptionStrategy(Enum):
@@ -63,8 +67,9 @@ class OptionStrategy(Enum):
     strangle = 10
 
 
-class Journal(object):
-    def __init__(self, abs_file_path, client_username, client_password, client_mfa):
+class Journal(LoggingMixin):
+    def __init__(self, abs_file_path, client_username, client_password, client_mfa, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.abs_file_path = abs_file_path
         self.username = client_username
         self.password = client_password

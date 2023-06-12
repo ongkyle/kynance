@@ -1,7 +1,11 @@
 import pandas as pd
 from enum import Enum
+
 from dataframe import Dataframe
 from strategies.strategy import Strategy
+from log.metaclass import MethodLoggerMeta
+
+__metaclass__ = MethodLoggerMeta
 
 
 class Statistics(Enum):
@@ -13,8 +17,8 @@ class Statistics(Enum):
 
 
 class Statistic(Dataframe):
-    def __init__(self, stat_name, csv_file, days, **kwargs):
-        super().__init__(csv_file=csv_file)
+    def __init__(self, stat_name, csv_file, days, *args, **kwargs):
+        super().__init__(csv_file=csv_file, *args, **kwargs)
         self.stat_name = stat_name
         self.days = days
     
@@ -45,8 +49,8 @@ class Statistic(Dataframe):
 
 
 class RhStatistic(Statistic):
-    def __init__(self, stat_name, csv_file, client, ticker, **kwargs):
-        super().__init__(stat_name=stat_name, csv_file=csv_file, **kwargs)
+    def __init__(self, stat_name, csv_file, client, ticker, *args, **kwargs):
+        super().__init__(stat_name=stat_name, csv_file=csv_file, *args, **kwargs)
         self.ticker = ticker
         self.client = client
 
@@ -68,8 +72,8 @@ class ClosePercent(Statistic, Strategy):
 
 
 class MaxMeanMovement(Statistic, Strategy):
-    def __init__(self, stat_name, csv_file, days):
-        super().__init__(stat_name=stat_name, csv_file=csv_file, days=days)
+    def __init__(self, stat_name, csv_file, days, *args, **kwargs):
+        super().__init__(stat_name=stat_name, csv_file=csv_file, days=days, *args, **kwargs)
         self.stat_name = stat_name
         self.days = days
 
@@ -95,8 +99,8 @@ class MaxMeanMovement(Statistic, Strategy):
 
 
 class MaxMedianMovement(Statistic, Strategy):
-    def __init__(self, stat_name, csv_file, days):
-        super().__init__(stat_name=stat_name, csv_file=csv_file, days=days)
+    def __init__(self, stat_name, csv_file, days, *args, **kwargs):
+        super().__init__(stat_name=stat_name, csv_file=csv_file, days=days, *args, **kwargs)
         self.stat_name = stat_name
         self.days = days
 

@@ -3,6 +3,7 @@ from enum import Enum
 
 from validators.validator import Validator
 from clients.client import ValidationClient
+from log.mixins import LoggingMixin
 
 class Validators(Enum):
     ticker = 0
@@ -18,8 +19,9 @@ class InvalidTickerException(Exception):
         super().__init__(self.message)
 
 
-class TickerValidator(Validator):
-    def __init__(self, ticker, client):
+class TickerValidator(Validator, LoggingMixin):
+    def __init__(self, ticker, client, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.ticker = ticker
         self.client = client
 
@@ -39,9 +41,10 @@ class InvalidOptionException(Exception):
         super().__init__(self.message)
 
 
-class OptionsValidator(Validator):
+class OptionsValidator(Validator, LoggingMixin):
 
-    def __init__(self, ticker, client):
+    def __init__(self, ticker, client, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.ticker = ticker
         self.client = client
 
@@ -74,9 +77,10 @@ class InvalidDataException(Exception):
         super().__init__(self.message)
 
 
-class DataValidator(Validator):
+class DataValidator(Validator, LoggingMixin):
 
-    def __init__(self, file):
+    def __init__(self, file, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.file = file
 
     def validate(self):
@@ -99,9 +103,10 @@ class InvalidEarningsException(Exception):
         self.message = f"Error: {self.ticker} does not have upcoming earnings dates."
         super().__init__(self.message)
 
-class EarningsValidator(Validator):
+class EarningsValidator(Validator, LoggingMixin):
 
-    def __init__(self, ticker: str, client: ValidationClient):
+    def __init__(self, ticker: str, client: ValidationClient, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.ticker = ticker
         self.client = client
 

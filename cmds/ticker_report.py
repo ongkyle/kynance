@@ -9,11 +9,13 @@ from strategies.mixins import StatisticFactory
 from clients.mixins import create_client, create_yf_validation_client
 from validators.mixins import ValidatorMixin
 
+__metaclass__ = MethodLoggerMeta
 
-class TickerReport(Cmd, ValidatorMixin):
+class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
     def __init__(self, ticker, days, client_username, client_password, 
                  client_mfa, optionslam_username, optionslam_password,
-                 client_type):
+                 client_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.ticker = ticker
         self.days = days
         self.optionslam_username = optionslam_username

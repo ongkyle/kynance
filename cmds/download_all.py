@@ -4,10 +4,18 @@ from scraper import Downloader
 import concurrent.futures
 
 from cmds.cmd import Cmd
+from log.mixins import LoggingMixin
+from log.metaclass import MethodLoggerMeta
+
+__metaclass__ = MethodLoggerMeta
 
 
-class DownloadAll(Cmd):
-    def __init__(self, dest_dir, client_username, client_password, client_mfa, optionslam_username, optionslam_password, ignore):
+class DownloadAll(Cmd, LoggingMixin):
+    def __init__(self, dest_dir, client_username, 
+                 client_password, client_mfa,
+                 optionslam_username, optionslam_password,
+                 ignore, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.dest_dir = dest_dir
         self.client_username = client_username
         self.client_password = client_password

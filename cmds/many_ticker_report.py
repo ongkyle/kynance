@@ -16,10 +16,14 @@ from validators.mixins import ValidatorMixin
 from clients.mixins import create_client, create_rh_client, Clients
 
 
-class ManyTickerReport(Cmd, ValidatorMixin):
+__metaclass__ = MethodLoggerMeta
+
+
+class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
     def __init__(self, max_workers, tickers, days, client_username, 
                  client_password, client_mfa, optionslam_username,
-                 optionslam_password):
+                 optionslam_password, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.max_workers = max_workers
         self.ticker = tickers
         self.days = days

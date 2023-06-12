@@ -1,7 +1,8 @@
 import abc
 from typing import Optional, Union
+from log.metaclass import MethodLoggerMeta
 
-class ValidationClient(metaclass=abc.ABCMeta):
+class ValidationClient(metaclass=MethodLoggerMeta):
     def __subclasshook__(cls, subclass):
         return (
                 hasattr(subclass, 'exists') and
@@ -24,7 +25,7 @@ class ValidationClient(metaclass=abc.ABCMeta):
     def has_future_earnings_dates(self, ticker) -> bool:
         raise NotImplemented
 
-class OptionsClient(metaclass=abc.ABCMeta):
+class OptionsClient(metaclass=MethodLoggerMeta):
     def __subclasshook__(cls, subclass):
         return (
             hasattr(subclass, 'get_straddle_predicted_movement') and

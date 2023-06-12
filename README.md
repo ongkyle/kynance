@@ -16,6 +16,8 @@ tools for automating options trading
     - switched to the y_finance --data-source which removed the need to "timeout" when the right strike price couldn't be found using the rh api
 [x] convert download_all.py into a cmd
 [ ] logging
+    - using a metaclass MethodLoggerMeta
+    - various wrapper functions for static, member and class methods
 [ ] ~~optimize hitting yahoo finance, robinhood api.~~
 [ ] makefile
 [ ] ~~use rh to get tickers of interest, download all of them at once with yf.download~~
@@ -30,5 +32,6 @@ tools for automating options trading
 [ ] write some tests
 [ ] schedule on a cron-tab
 [ ] send notifications via email and text
+[ ] how to deploy to a raspberry pi?
 [ ] scrape historical options data from https://www.cboe.com/us/options/market_statistics/historical_data/
     - [ ] use that data to backfill straddle_predicted_move and profit_probability

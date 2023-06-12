@@ -12,3 +12,4 @@ yfinance
 requests_cache
 requests_ratelimiter
 pyrate_limiter
+pyyaml
