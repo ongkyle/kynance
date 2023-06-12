@@ -15,7 +15,7 @@ tools for automating options trading
 [x] what to do about DECRYPTION_FAILED_OR_BAD_RECORD_MAC errors due to @timeout
     - switched to the y_finance --data-source which removed the need to "timeout" when the right strike price couldn't be found using the rh api
 [x] convert download_all.py into a cmd
-[ ] logging
+[x] logging
     - using a metaclass MethodLoggerMeta
     - various wrapper functions for static, member and class methods
 [ ] ~~optimize hitting yahoo finance, robinhood api.~~
