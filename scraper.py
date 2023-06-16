@@ -1,8 +1,10 @@
 import requests, os, weakref
 from bs4 import BeautifulSoup
 
+from log.metaclass import MethodLoggerMeta
 
-class Downloader(object):
+
+class Downloader(object, metaclass=MethodLoggerMeta):
     def __init__(self, needs_login, login_payload, base_url, download_postfix, login_postfix, csrf_attr, headers):
         self.base_url = base_url
         self.download_postfix = download_postfix
@@ -44,7 +46,6 @@ class Downloader(object):
 
         content = self.get_content_to_download()
         destination_dir = os.path.dirname(destination_file)
-        print (destination_dir)
         self.ensure_dirs(destination_dir)
         self.write(content, destination_file, "wb")
 
@@ -64,11 +65,9 @@ class Downloader(object):
         return response.content
 
     def ensure_dirs(self, destination):
-        print (f"ensuring {destination}")
         os.makedirs(destination, exist_ok=True)
 
     def write(self, content, destination, mode):
-        print (f"writing {destination}")
         with open(destination, mode) as f:
             f.write(content)
 

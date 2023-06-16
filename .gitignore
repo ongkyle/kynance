@@ -4,4 +4,4 @@ venv/**
 **/__pycache__
 yfinance.cache
 .*ipynb
-kynance.log
+kynance.log.*

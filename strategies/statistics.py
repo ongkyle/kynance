@@ -16,7 +16,7 @@ class Statistics(Enum):
     profit_probability = 4
 
 
-class Statistic(Dataframe):
+class Statistic(Dataframe, metaclass=MethodLoggerMeta):
     def __init__(self, stat_name, csv_file, days, *args, **kwargs):
         super().__init__(csv_file=csv_file, *args, **kwargs)
         self.stat_name = stat_name
@@ -25,9 +25,7 @@ class Statistic(Dataframe):
     def num_days_to_calculate(self) -> int:
         num_earnings = self.num_earnings
         if self.days >= num_earnings:
-            print (f"num_days_to_calculate: {num_earnings}")
             return num_earnings
-        print (f"num_days_to_calculate: {num_earnings - self.days }")
         return num_earnings - self.days
     
     def get_window_length(self) -> int:
@@ -39,7 +37,6 @@ class Statistic(Dataframe):
         idx = [idx for idx in range(self.num_earnings - 1, self.days - 1, -1)]
         if self.days >= self.num_earnings:
             idx = [idx for idx in range(self.num_earnings - 1, -1, -1)]
-        print(f"get_index: {idx}")
         return idx
         
     
@@ -87,11 +84,9 @@ class MaxMeanMovement(Statistic, Strategy):
     def calculate_historical_max_mean_movement(self):
         historical_max_means = []
         days_to_calculate = self.num_days_to_calculate()
-        print (f"calculate_historical_max_mean_movement: {days_to_calculate}")
 
         for i in range(0, days_to_calculate):
             window = self.df["Max Move"].iloc[i:days_to_calculate + i].abs()
-            print (f"calculate_historical_max_mean_movement: {window} {window.mean()}")
             historical_max_means.append(window.mean())
 
         idx = self.get_index()
@@ -146,7 +141,6 @@ class ProfitProbability(RhStatistic, Strategy):
         straddle_predicted_movement = self.get_straddle_predicted_movement()
         if straddle_predicted_movement.isnull().all():
             profit_probability = pd.Series(None, index=[self.df.shape[0] - 1])
-            print(f"calculate_profit_probability: {self.ticker} {profit_probability}")
             return profit_probability
         max_moves = self.get_max_moves()
         comparison = straddle_predicted_movement.values < max_moves.abs().values
@@ -158,9 +152,7 @@ class ProfitProbability(RhStatistic, Strategy):
     def get_straddle_predicted_movement(self):
         window_length = self.get_window_length()
         straddle_predicted_movement = self.client.get_straddle_predicted_movement()
-        print (f"get_straddle_predicted_movement: {self.ticker} {straddle_predicted_movement}")
         straddle_predicted_movement = pd.Series(straddle_predicted_movement for _ in range(window_length))
-        print (f"get_straddle_predicted_movement: {self.ticker} {straddle_predicted_movement}")
         return straddle_predicted_movement
 
     def get_max_moves(self):

@@ -1,3 +1,4 @@
+import logging
 import random
 import weakref
 import inspect
@@ -69,7 +70,7 @@ class Robinhood(OptionsClient, RobinhoodBase):
 
     def get_watchlists_names(self):
         watchlists = rh.get_all_watchlists("results")
-        print(watchlists)
+        self.log(watchlists)
         if watchlists:
             return [k.get("display_name", None) for k in watchlists]
         return []
@@ -85,45 +86,36 @@ class Robinhood(OptionsClient, RobinhoodBase):
 
     def get_watchlist_by_name(self, name, info=None):
         res = rh.get_watchlist_by_name(name, info)
-        print(res)
+        self.log(res)
         return res
 
     def get_upcoming_earnings_tickers(self):
-        res = rh.get_all_stocks_from_market_tag('upcoming-earnings', "symbol")
-        print(f"get_upcoming_earnings_tickers: {res}")
-        return res
+        return rh.get_all_stocks_from_market_tag('upcoming-earnings', "symbol")
 
     def export_option_trade_history(self, dir_path, file_name=None):
-        res = rh.export_completed_option_orders(dir_path, file_name)
-        print(res)
-        return res
+        return rh.export_completed_option_orders(dir_path, file_name)
 
     def find_options_by_expiration_and_strike(self, symbols, expiration_date, strike_price, info=None):
         with self.semaphore:
             self.login()
-            res = rh.find_options_by_expiration_and_strike(
+            return rh.find_options_by_expiration_and_strike(
                 inputSymbols=symbols,
                 expirationDate=expiration_date,
                 strikePrice=strike_price,
                 info=info)
-            print(f"find_options_by_expiration_and_strike: {res}")
-            return res
 
     def find_option_mark_price(self, symbols, expiration_date, strike_price):
         options = self.find_options_by_expiration_and_strike(symbols, expiration_date, strike_price)
-        print(f"find_option_mark_price: {symbols} {options}")
         mark_price = []
         if options:
             mark_price = [
                 option.get("mark_price", None) for option in options
             ]
-        print(f"find_option_mark_price: {symbols} {mark_price}")
         return mark_price
 
     def find_options_mark_price_by_strike(self, input_symbols, strike_price, option_type=None, info=None):
         with self.semaphore:
             options = rh.find_options_by_strike(input_symbols, strike_price, option_type, info)
-            print(f"find_options_mark_price_by_strike: {options}")
             mark_price = []
             if options:
                 mark_price = [
@@ -133,7 +125,6 @@ class Robinhood(OptionsClient, RobinhoodBase):
 
     def get_earnings_report(self, symbol):
         earnings = rh.get_earnings(symbol=symbol, info="report")
-        print(f"get_earnings_report: {earnings}")
         earnings = [earning for earning in earnings if earning is not None]
         return [report["date"] for report in earnings]
 
@@ -153,16 +144,13 @@ class Robinhood(OptionsClient, RobinhoodBase):
 
     def get_next_earnings_date(self, symbol):
         earnings = self.get_earnings_report(symbol)
-        print(f"get_next_earnings_date: {earnings}")
         earnings_dates = self.convert_to_dates(earnings)
-        print(f"get_next_earnings_date: {earnings_dates}")
         return self.get_closest(date.today(), earnings_dates)
 
     def get_options_chain(self, symbol):
         with self.semaphore:
             sleep(1 + random.randint(1, 3))
             res = rh.get_chains(symbol=symbol, info="expiration_dates")
-            print(f"get_options_chain: {res}")
             return res
 
     def get_option_chain_dates(self, symbol):
@@ -173,9 +161,7 @@ class Robinhood(OptionsClient, RobinhoodBase):
 
     def get_chain_just_after_earnings(self, symbol):
         expiration_dates = self.get_option_chain_dates(symbol)
-        print(f"get_chain_just_after_earnings: {expiration_dates}")
         res = investpy.get_stock_information(stock=symbol, country='united states', as_json=True)
-        earnings_date = res.get("Next Earnings Date", None)
         earnings_date = datetime.strptime(earnings_date, "%d/%m/%Y")
         if date:
             return self.get_closest(earnings_date.date(), expiration_dates)
@@ -184,7 +170,6 @@ class Robinhood(OptionsClient, RobinhoodBase):
         with self.semaphore:
             res = yf.Ticker(symbol)
             price = res.history(period="1d")["Close"][0] 
-            print(f"get_latest_price: {symbol} {price}")
             return price
 
     @staticmethod
@@ -209,26 +194,21 @@ class Robinhood(OptionsClient, RobinhoodBase):
             )
             strike_price += 0.5
             strike_price = round(strike_price, 1)
-            print(strike_price)
         return option_prices
 
     def get_straddle_predicted_movement(self, symbol):
         post_earnings_expiry_chain = YFinance(symbol).get_chain_just_after_earnings()
         # post_earnings_expiry_chain = self.get_chain_just_after_earnings(symbol)
-        print (str(post_earnings_expiry_chain))
         if not post_earnings_expiry_chain:
             return
         latest_price = self.get_latest_price(symbol)
         try:
             option_prices = self.get_closest_option_mark_price(symbol, str(post_earnings_expiry_chain), round(latest_price))
         except TimeoutError as err:
-            print (f"{err} | {symbol}")
+            self.log(err, logging.Error)
             return None
-        print (f"get_straddle_predicted_movement: {symbol} {option_prices}")
         option_prices = self.convert_to_float(option_prices)
         straddle_price = sum(option_prices)
-        print (f"get_straddle_predicted_movement: {symbol} {straddle_price}")
         straddle_predicted_movement = self.calculate_straddle_predicted_movement(straddle_price, latest_price)
-        print (f"get_straddle_predicted_movement: {symbol} {straddle_predicted_movement}")
         straddle_predicted_movement = round(straddle_predicted_movement, 2)
         return straddle_predicted_movement

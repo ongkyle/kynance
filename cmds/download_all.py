@@ -46,7 +46,6 @@ class DownloadAll(Cmd, LoggingMixin):
 
     @staticmethod
     def download(ticker, optionslam_username, optionslam_password, file):
-        print(f"Downloading symbol: {ticker} to file: {file}")
 
         login_payload = {
             "username": optionslam_username,
@@ -91,13 +90,12 @@ class DownloadAll(Cmd, LoggingMixin):
             future_to_symbol[future] = symbol
         return future_to_symbol
 
-    @staticmethod
-    def resolve_futures(futures):
+    def resolve_futures(self, futures):
         for future in concurrent.futures.as_completed(futures):
             res = futures[future]
             try:
                 data = future.result()
             except Exception as exc:
-                print('%r generated an exception: %s' % (res, exc))
+                self.log('%r generated an exception: %s' % (res, exc), logging.ERROR)
             else:
-                print(data)
+                self.log(data)

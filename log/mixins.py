@@ -10,7 +10,6 @@ class Loggers:
     def member_method_logger(method:callable, logger:logging.Logger):
         def inner(self, *args, **kwargs):
             logger.info(f"starting | args: {args} | kwargs: {kwargs}")
-            # print(logger.__dict__, name, args, kwargs)
             res = method(self, *args, **kwargs)
             logger.info(f"finished | args: {args} | kwargs: {kwargs} | returns: {res}")
             return res

@@ -29,7 +29,6 @@ class ValidatorMixin(object):
     def validate(ticker: str, file:str, client: ValidationClient):
         factory = ValidatorFactory(ticker=ticker, file=file, client=client)
         for validator_type in Validators:
-            print(f"validate: {validator_type}")
             validator = factory.create(validator_type=validator_type)
             validator.validate()
 

@@ -4,6 +4,7 @@ from typing import Optional
 from .robinhood import Robinhood
 from .yfinance import YFinance, YFinanceValidation
 from .client import Client
+from log.metaclass import MethodLoggerMeta
 
 class Clients(Enum):
     y_finance = 0
@@ -11,14 +12,13 @@ class Clients(Enum):
     robinhood = 2
     robinhood_validation = 3
 
-class ClientFactory(object):
+class ClientFactory(object, metaclass=MethodLoggerMeta):
     def __init__(self, username: str, password: str, mfa_code: str):
         self.username = username
         self.password = password
         self.mfa_code = mfa_code
 
     def create(self, client_type: Clients, ticker: str) -> Client:
-        print (client_type)
         match client_type:
             case Clients.y_finance.name:
                 return YFinance(ticker=ticker)

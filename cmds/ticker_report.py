@@ -37,7 +37,7 @@ class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
                 file=destination_file
             )
         except Exception as e:
-            print(e)
+            self.log(e, logging.ERROR)
             sys.exit(1)
 
         self.download(destination_file)
@@ -79,10 +79,8 @@ class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
     def show_statistics(self, df, source_file):
         titles = []
         for statistic in Statistics:
-            print (f"ticker_reporter: {self.ticker} {statistic}")
             statistic_strategy = self.create_statistic(statistic, source_file)
             title, stat = statistic_strategy.execute()
-            print (f"ticker_reporter: {self.ticker} {title} {stat}")
             titles.append(title)
             df[title] = stat
         df.print(titles)

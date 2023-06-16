@@ -18,6 +18,8 @@ tools for automating options trading
 - [x] logging
      - using a metaclass MethodLoggerMeta
      - various wrapper functions for static, member and class methods
+- [x] define a logging retention policy
+    - RotatingFileHandler(maxBytes=10000000, backupCount=2)
 - [ ] ~~optimize hitting yahoo finance, robinhood api.~~
 - [ ] makefile
 - [ ] ~~use rh to get tickers of interest, download all of them at once with yf.download~~

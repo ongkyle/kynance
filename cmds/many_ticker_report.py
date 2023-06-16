@@ -7,7 +7,7 @@ from typing import List
 import numpy as np
 
 from clients import *
-from cmd import Cmd
+from cmds.cmd import Cmd
 from dataframe import *
 from scraper import Downloader
 from strategies.statistics import Statistics
@@ -37,7 +37,6 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
         valid_tickers = self.filter_valid_tickers(tickers_with_upcoming_earnings)
-        print (self.max_workers)
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_symbol = self.submit_fn_to_executor(executor,
                                                           self.assemble_data,
@@ -57,7 +56,6 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
 
     def filter_valid_tickers(self, tickers: List[str]):
         valid_tickers = []
-        print (self.max_workers)
         validation_client = create_client(client_type=Clients.y_finance_validation)
         for ticker in tickers:
             destination_dir = f"{os.getcwd()}/data/{ticker}/"
@@ -71,18 +69,15 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
                     file=destination_dir,
                 )
             except Exception as e:
-                print(e)
+                self.log(e, logging.ERROR)
                 continue
 
             valid_tickers.append(ticker)
         
-        print (f"filter_valid_tickers: {valid_tickers}")
-
         return valid_tickers
 
     def calculate_statistics(self, source_file, ticker):
         data = dict()
-        print (f"Calculating Statistics: {ticker}")
         for statistic in Statistics:
             statistic_strategy = self.create_statistic(statistic, source_file, ticker)
             title, stat = statistic_strategy.execute()
@@ -125,15 +120,14 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
             future_to_symbol[future] = symbol
         return future_to_symbol
 
-    @staticmethod
-    def resolve_futures(futures):
+    def resolve_futures(self, futures):
         data = dict()
         for future in concurrent.futures.as_completed(futures):
             res = futures[future]
             try:
                 res = future.result()
             except Exception as exc:
-                print('%r generated an exception: %s' % (res, exc))
+                self.log('%r generated an exception: %s' % (res, exc), logging.ERROR)
             else:
                 for k, v in res.items():
                     stats = data.get(k, [])

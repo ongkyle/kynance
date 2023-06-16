@@ -1,7 +1,8 @@
 import abc
+from log.metaclass import MethodLoggerMeta
 
 
-class Cmd(metaclass=abc.ABCMeta):
+class Cmd(metaclass=MethodLoggerMeta):
     def __subclasshook__(cls, subclass):
         return (
                 hasattr(subclass, 'execute') and

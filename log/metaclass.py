@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 import yaml
 import logging
 import abc
@@ -15,18 +15,24 @@ class MethodLoggerMeta(abc.ABCMeta):
             logger_type = cls.get_logger_type(cls=cls, key=key, obj=value)
             if logger_type is not None:
                 logger = cls.get_logger(obj=value)
-                print (logger_type)
                 method_logger = factory.create(
                     method_logger_type=logger_type,
                     logger=logger,
                     obj=value
                 )
                 attrs_copy[key] = method_logger
+        
+        name, func = cls.add_logging_member_function()
+        attrs_copy[name] = func
         return super(MethodLoggerMeta, cls).__new__(cls, clsname, bases, attrs_copy)
 
-
+    def add_logging_member_function() -> tuple[str,callable]:
+        def log(self, msg: str, level: Optional[int] = logging.INFO):
+            logger = logging.getLogger(self.__module__ + "." + "log")
+            logger.log(msg=msg, level=level)
+        return "log",log
+    
     def get_logger_type(cls, key: str, obj: object) -> MethodLoggers:
-        print (f"{cls} {obj} {key}")
         is_callable = callable(obj)
         is_public = not key.startswith('__')
         if is_callable and is_public:
@@ -37,7 +43,7 @@ class MethodLoggerMeta(abc.ABCMeta):
         
     
     def get_logger(obj: object):
-        logger = logging.getLogger(obj.__module__+ "." + obj.__qualname__)
+        logger = logging.getLogger(obj.__module__ + "." + obj.__qualname__)
         logger.info(f"Initialized logger: {logger.__dict__}")
         return logger
     
