@@ -32,7 +32,8 @@ tools for automating options trading
 - [ ] provide a link to robinhood in the ticker column for ticker_report.py
 - [ ] fix index 0 is out of bounds for axis 0 with size 0 errors from yfinance
 - [ ] write some tests
-- [ ] schedule on a cron-tab
+- [x] schedule on a cron-tab
+- [x] schedule on a systemd timer
 - [ ] send notifications via email and text
 - [ ] how to deploy to a raspberry pi?
 - [ ] scrape historical options data from https://www.cboe.com/us/options/market_statistics/historical_data/

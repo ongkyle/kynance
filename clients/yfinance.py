@@ -59,7 +59,7 @@ class YFinance(OptionsClient, object):
         self.session = CachedLimiterSession(
                             limiter=Limiter(RequestRate(2, Duration.SECOND*5)),  # max 2 requests per 5 seconds
                             bucket_class=MemoryQueueBucket,
-                            backend=SQLiteCache("yfinance.cache"))
+                            backend=SQLiteCache("/home/kyle/workspace/kynance/yfinance.cache"))
         self.ticker = yfinance.Ticker(ticker=ticker, session=self.session)
 
     def exists(self, ticker=None):

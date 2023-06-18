@@ -2,6 +2,7 @@ from typing import Optional, Tuple
 import yaml
 import logging
 import abc
+import os
 
 from log.mixins import MethodLoggerFactory, MethodLoggers
 from config import LOG_CONFIG_FILE
@@ -48,6 +49,6 @@ class MethodLoggerMeta(abc.ABCMeta):
         return logger
     
     def load_logging_config():
-        with open(LOG_CONFIG_FILE ,"r") as cfg_file:
+        with open(os.path.expanduser(LOG_CONFIG_FILE) ,"r") as cfg_file:
             logging_cfg = yaml.safe_load(cfg_file)
             logging.config.dictConfig(logging_cfg)

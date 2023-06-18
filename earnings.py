@@ -1,6 +1,7 @@
 import argparser
 import logging.config
 import yaml
+import os
 
 from cmds.download_all import DownloadAll
 from cmds.journal import JournalBackfill, JournalUpdate
@@ -11,7 +12,7 @@ from config import *
 
 
 def init_logger():
-    with open(LOG_CONFIG_FILE ,"r") as cfg_file:
+    with open(os.path.expanduser(LOG_CONFIG_FILE) ,"r") as cfg_file:
         logging_cfg = yaml.safe_load(cfg_file)
         logging.config.dictConfig(logging_cfg)
     return logging.getLogger(__name__)
@@ -58,10 +59,15 @@ def create_cmd(args):
             args.rh_mfa
         )
     elif not (args.do_report or args.do_journal or args.do_download):
-        return TickerReport(args.tickers[0], args.days,
-                            args.rh_username, args.rh_password,
-                            args.rh_mfa, args.optionslam_username,
-                            args.optionslam_password, args.client)
+        return TickerReport(
+            args.tickers[0], 
+            args.days,
+            args.rh_username, args.rh_password,
+            args.rh_mfa, args.optionslam_username,
+            args.optionslam_password,
+            args.client,
+            args.data_dir
+        )
     elif args.do_report:
         return ManyTickerReport(
             args.max_workers,
@@ -69,7 +75,8 @@ def create_cmd(args):
             args.days,
             args.rh_username, args.rh_password,
             args.rh_mfa, args.optionslam_username,
-            args.optionslam_password
+            args.optionslam_password,
+            args.data_dir
         )
     elif args.do_download:
         return DownloadAll(

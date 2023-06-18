@@ -12,9 +12,11 @@ from validators.mixins import ValidatorMixin
 __metaclass__ = MethodLoggerMeta
 
 class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
-    def __init__(self, ticker, days, client_username, client_password, 
-                 client_mfa, optionslam_username, optionslam_password,
-                 client_type, *args, **kwargs):
+    def __init__(self, ticker: str, days: int,
+                 client_username: str, client_password: str, 
+                 client_mfa: int, optionslam_username: str, 
+                 optionslam_password: str, client_type: str, 
+                 data_dir: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ticker = ticker
         self.days = days
@@ -23,13 +25,22 @@ class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
         self.client = create_client(client_type=client_type, username=client_username, 
                                     password=client_password, mfa_code=client_mfa, ticker=ticker)
         self.stat_factory = StatisticFactory(days)
+        self.data_dir = data_dir
+    
+    
+    def get_ticker_data_dir(self):
+        return f"{self.data_dir}/{self.ticker}/"
+    
+    def get_ticker_destination_file(self):
+        return os.path.join(
+                    self.get_ticker_data_dir(),
+                    "earnings.csv"
+                )
 
     def execute(self):
-
-        destination_dir = f"{os.getcwd()}/data/{self.ticker}/"
-        destination_file = os.path.join(destination_dir, "earnings.csv")
-
+        destination_file = self.get_ticker_destination_file()
         validation_client = create_yf_validation_client()
+        
         try:
             self.validate(
                 ticker=self.ticker,
@@ -46,7 +57,7 @@ class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
 
         self.show_statistics(df, destination_file)
 
-    def download(self, file):
+    def download(self, file: str):
 
         login_payload = {
             "username": self.optionslam_username,
@@ -76,7 +87,7 @@ class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
                         headers=headers) as d:
             d.download(file)
 
-    def show_statistics(self, df, source_file):
+    def show_statistics(self, df: Dataframe, source_file: str):
         titles = []
         for statistic in Statistics:
             statistic_strategy = self.create_statistic(statistic, source_file)

@@ -75,19 +75,28 @@ class DownloadAll(Cmd, LoggingMixin):
                         headers=headers) as d:
             d.download(file)
         return f"Finished Downloading symbol: {ticker} to file: {file}"
+    
+    def get_ticker_destination_file(self, ticker: str):
+        return os.path.join(
+                    self.get_ticker_data_dir(ticker=ticker),
+                    "earnings.csv"
+                )
+
+    def get_ticker_data_dir(self, ticker: str):
+        return f"{self.data_dir}/{ticker}/"
 
     def submit_download_to_executor(self, executor, tickers):
         future_to_symbol = dict()
-        for symbol in tickers:
-            destination_file = os.path.join(self.dest_dir, symbol, "earnings.csv")
+        for ticker in tickers:
+            destination_file = self.get_ticker_destination_file(ticker=ticker)
             future = executor.submit(
                 self.download,
-                symbol,
+                ticker,
                 self.optionslam_username,
                 self.optionslam_password,
                 destination_file
             )
-            future_to_symbol[future] = symbol
+            future_to_symbol[future] = ticker
         return future_to_symbol
 
     def resolve_futures(self, futures):

@@ -1,4 +1,4 @@
-LOG_CONFIG_FILE="log/config.yml"
+LOG_CONFIG_FILE="~/workspace/kynance/log/config.yml"
 
 DEFAULT_REQUIRES_ENV_VAR = True
 
@@ -158,5 +158,5 @@ PARSER_CONFIG = {
         "help": "available datasources include: 'robinhood' or 'y_finance'",
         "dest": "client",
         "choices": ["robinhood", "y_finance"]
-    }
+    },
 }

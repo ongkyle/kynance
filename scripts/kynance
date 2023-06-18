@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+activate_virtual_env() {
+    . ~/workspace/kynance/venv/bin/activate
+}
+
+execute_kynance() {
+    python3 ~/workspace/kynance/earnings.py "$@"
+}
+
+main() {
+    activate_virtual_env
+    execute_kynance "$@"
+}
+
+main "$@"

@@ -16,13 +16,12 @@ from validators.mixins import ValidatorMixin
 from clients.mixins import create_client, create_rh_client, Clients
 
 
-__metaclass__ = MethodLoggerMeta
-
-
 class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
-    def __init__(self, max_workers, tickers, days, client_username, 
-                 client_password, client_mfa, optionslam_username,
-                 optionslam_password, *args, **kwargs):
+    def __init__(self, max_workers:int, tickers: list[str], 
+                 days: int, client_username: str, 
+                 client_password: str, client_mfa: str,
+                 optionslam_username: str, optionslam_password: str, 
+                 data_dir: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.max_workers = max_workers
         self.ticker = tickers
@@ -33,6 +32,7 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
                                           password=client_password, 
                                           mfa_code=client_mfa)
         self.stat_factory = StatisticFactory(days)
+        self.data_dir = data_dir
 
     def execute(self):
         tickers_with_upcoming_earnings = self.get_upcoming_earnings_tickers()
@@ -45,7 +45,11 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         df = pd.DataFrame.from_dict(data)
         df = self.reorder_cols(df)
 
+
+    def print(self, df: pd.DataFrame):
+        pd.set_option('display.max_columns', None)
         print(df.sort_values("profit_probability %", ascending=False))
+        pd.reset_option('display.max_columns')
 
     @staticmethod
     def reorder_cols(df):
@@ -53,13 +57,22 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         cols = cols[-2:] + cols[:-2]
         df = df[cols]
         return df
+    
+    def get_ticker_data_dir(self, ticker: str):
+        return f"{self.data_dir}/{ticker}/"
+    
+    def get_ticker_destination_file(self, ticker: str):
+        return os.path.join(
+                    self.get_ticker_data_dir(ticker=ticker),
+                    "earnings.csv"
+                )
 
     def filter_valid_tickers(self, tickers: List[str]):
         valid_tickers = []
         validation_client = create_client(client_type=Clients.y_finance_validation)
         for ticker in tickers:
-            destination_dir = f"{os.getcwd()}/data/{ticker}/"
-            destination_file = os.path.join(destination_dir, "earnings.csv")
+            destination_dir = self.get_ticker_data_dir(ticker=ticker)
+            destination_file = self.get_ticker_destination_file(ticker=ticker)
             self.download_if_necessary(ticker, destination_file)
 
             try:
@@ -106,18 +119,16 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         )
         return client.get_next_earnings_date()
 
-    @staticmethod
-    def submit_fn_to_executor(executor, fn, tickers):
+    def submit_fn_to_executor(self, executor, fn, tickers):
         future_to_symbol = dict()
-        for symbol in tickers:
-            destination_dir = f"/{os.getcwd()}/data/{symbol}/"
-            destination_file = os.path.join(destination_dir, "earnings.csv")
+        for ticker in tickers:  
+            destination_file = self.get_ticker_destination_file(ticker=ticker)
             future = executor.submit(
                 fn,
-                symbol,
+                ticker,
                 destination_file
             )
-            future_to_symbol[future] = symbol
+            future_to_symbol[future] = ticker
         return future_to_symbol
 
     def resolve_futures(self, futures):
