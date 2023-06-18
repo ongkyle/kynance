@@ -34,6 +34,7 @@ tools for automating options trading
 - [ ] write some tests
 - [x] schedule on a cron-tab
 - [x] schedule on a systemd timer
+- [ ] add make targets for interacting with systemd
 - [ ] send notifications via email and text
 - [ ] how to deploy to a raspberry pi?
 - [ ] scrape historical options data from https://www.cboe.com/us/options/market_statistics/historical_data/
