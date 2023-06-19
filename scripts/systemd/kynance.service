@@ -1,0 +1,6 @@
+[Unit]
+Description="Kynance earnings report"
+
+[Service]
+ExecStart=/usr/bin/kynance --report
+User=kyle

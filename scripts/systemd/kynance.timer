@@ -1,0 +1,10 @@
+[Unit]
+Description="Run kynance --report at 21:00"
+
+[Timer]
+Unit=kynance.service
+OnActiveSec=5seconds
+OnCalendar=Mon..Sun *-*-* 21:00:00
+
+[Install]
+WantedBy=multi-user.target
