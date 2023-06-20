@@ -8,7 +8,7 @@ tools for automating options trading
 - [x] scrape optionslam for all it's historical data (where to put it)?
 - [ ] calculate future earning's statistics on my own
 - [x] calculate the probability of profit
-- [ ] dockerize
+- [ ] ~~dockerize~~ running a systemd timer in docker goes against the docker philosophy of having only one process per container
 - [ ] automatically write to a journal
      - [ ] how do i match opening a position with closing a position?
 - [ ] figure out what to do about getting rate-limited by the rh api
