@@ -5,3 +5,7 @@ venv/**
 yfinance.cache
 *.ipynb
 kynance.log*
+build
+build/**
+dist
+dist/**
