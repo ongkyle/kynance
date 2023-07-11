@@ -11,7 +11,7 @@ __metaclass__ = MethodLoggerMeta
 
 
 class DownloadAll(Cmd, LoggingMixin):
-    def __init__(self, dest_dir, client_username, 
+    def __init__(self, dest_dir, client_username,
                  client_password, client_mfa,
                  optionslam_username, optionslam_password,
                  ignore, *args, **kwargs):
@@ -75,12 +75,12 @@ class DownloadAll(Cmd, LoggingMixin):
                         headers=headers) as d:
             d.download(file)
         return f"Finished Downloading symbol: {ticker} to file: {file}"
-    
+
     def get_ticker_destination_file(self, ticker: str):
         return os.path.join(
-                    self.get_ticker_data_dir(ticker=ticker),
-                    "earnings.csv"
-                )
+            self.get_ticker_data_dir(ticker=ticker),
+            "earnings.csv"
+        )
 
     def get_ticker_data_dir(self, ticker: str):
         return f"{self.data_dir}/{ticker}/"

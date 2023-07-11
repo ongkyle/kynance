@@ -1,4 +1,4 @@
-LOG_CONFIG_FILE="~/workspace/kynance/log/config.yml"
+LOG_CONFIG_FILE="/kynance/log/config.yml"
 
 DEFAULT_REQUIRES_ENV_VAR = True
 

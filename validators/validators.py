@@ -5,6 +5,7 @@ from validators.validator import Validator
 from clients.client import ValidationClient
 from log.mixins import LoggingMixin
 
+
 class Validators(Enum):
     ticker = 0
     option = 1
@@ -98,6 +99,7 @@ class InvalidEarningsException(Exception):
         self.ticker = ticker
         self.message = f"Error: {self.ticker} does not have upcoming earnings dates."
         super().__init__(self.message)
+
 
 class EarningsValidator(Validator, LoggingMixin):
 

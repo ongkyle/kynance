@@ -2,6 +2,7 @@ import abc
 from typing import Optional, Union
 from log.metaclass import MethodLoggerMeta
 
+
 class ValidationClient(metaclass=MethodLoggerMeta):
     def __subclasshook__(cls, subclass):
         return (
@@ -16,24 +17,26 @@ class ValidationClient(metaclass=MethodLoggerMeta):
     @abc.abstractmethod
     def exists(self, ticker) -> bool:
         raise NotImplemented
-    
+
     @abc.abstractmethod
     def supports_options(self, ticker) -> bool:
         raise NotImplemented
-    
+
     @abc.abstractmethod
     def has_future_earnings_dates(self, ticker) -> bool:
         raise NotImplemented
 
+
 class OptionsClient(metaclass=MethodLoggerMeta):
     def __subclasshook__(cls, subclass):
         return (
-            hasattr(subclass, 'get_straddle_predicted_movement') and
-            callable(subclass.get_straddle_predicted_movement)
+                hasattr(subclass, 'get_straddle_predicted_movement') and
+                callable(subclass.get_straddle_predicted_movement)
         )
-    
+
     @abc.abstractmethod
     def get_straddle_predicted_movement(self, symbol: Optional[str]) -> float:
         raise NotImplemented
+
 
 Client = Union[ValidationClient, OptionsClient]

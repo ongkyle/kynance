@@ -16,7 +16,6 @@ from clients.client import ValidationClient, OptionsClient
 from log.mixins import LoggingMixin
 from log.metaclass import MethodLoggerMeta
 
-__metaclass__ = MethodLoggerMeta
 
 class RobinhoodBase(object):
     def __init__(self, username=None, password=None, mfa_code=None, concurrency_limit=2, *args, **kwargs):
@@ -27,7 +26,7 @@ class RobinhoodBase(object):
         self._finalize = weakref.finalize(self, self.logout)
         self.semaphore = Semaphore(concurrency_limit)
         self.login()
-    
+
     def __enter__(self):
         return self
 
@@ -37,7 +36,6 @@ class RobinhoodBase(object):
     def login(self):
         kwargs = {"username": self.username, "password": self.password, "mfa_code": self.mfa_code}
         rh.login(**kwargs)
-
 
     def logout(self):
         try:
@@ -169,7 +167,7 @@ class Robinhood(OptionsClient, RobinhoodBase):
     def get_latest_price(self, symbol):
         with self.semaphore:
             res = yf.Ticker(symbol)
-            price = res.history(period="1d")["Close"][0] 
+            price = res.history(period="1d")["Close"][0]
             return price
 
     @staticmethod
@@ -203,7 +201,8 @@ class Robinhood(OptionsClient, RobinhoodBase):
             return
         latest_price = self.get_latest_price(symbol)
         try:
-            option_prices = self.get_closest_option_mark_price(symbol, str(post_earnings_expiry_chain), round(latest_price))
+            option_prices = self.get_closest_option_mark_price(symbol, str(post_earnings_expiry_chain),
+                                                               round(latest_price))
         except TimeoutError as err:
             self.log(err, logging.Error)
             return None

@@ -1,15 +1,17 @@
 #!/bin/bash
 
-: ${PYTHON_VERSION:="3.10"}
-: ${DEBIAN_VERSION:="buster"}
-: ${IMG_TAG:=""}
+: ${PYTHON_VERSION:="3.9"}
+: ${IMG_TAG:="kynance/builder"}
+: ${BUILD_PLATFORM:="linux/arm32v7"}
 
 main() {
-  docker build . \
+  docker buildx build . \
         --rm \
+        --load \
         -f docker/Dockerfile \
-        --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
-        --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
+        -t "${IMG_TAG}" \
+        --platform "${BUILD_PLATFORM}" \
+        --build-arg BUILD_PLATFORM=${BUILD_PLATFORM} \
         "$@";
 }
 

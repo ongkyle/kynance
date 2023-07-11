@@ -11,36 +11,36 @@ from validators.mixins import ValidatorMixin
 
 __metaclass__ = MethodLoggerMeta
 
+
 class TickerReport(Cmd, ValidatorMixin, LoggingMixin):
     def __init__(self, ticker: str, days: int,
-                 client_username: str, client_password: str, 
-                 client_mfa: int, optionslam_username: str, 
-                 optionslam_password: str, client_type: str, 
+                 client_username: str, client_password: str,
+                 client_mfa: int, optionslam_username: str,
+                 optionslam_password: str, client_type: str,
                  data_dir: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ticker = ticker
         self.days = days
         self.optionslam_username = optionslam_username
         self.optionslam_password = optionslam_password
-        self.client = create_client(client_type=client_type, username=client_username, 
+        self.client = create_client(client_type=client_type, username=client_username,
                                     password=client_password, mfa_code=client_mfa, ticker=ticker)
         self.stat_factory = StatisticFactory(days)
         self.data_dir = data_dir
-    
-    
+
     def get_ticker_data_dir(self):
         return f"{self.data_dir}/{self.ticker}/"
-    
+
     def get_ticker_destination_file(self):
         return os.path.join(
-                    self.get_ticker_data_dir(),
-                    "earnings.csv"
-                )
+            self.get_ticker_data_dir(),
+            "earnings.csv"
+        )
 
     def execute(self):
         destination_file = self.get_ticker_destination_file()
         validation_client = create_yf_validation_client()
-        
+
         try:
             self.validate(
                 ticker=self.ticker,

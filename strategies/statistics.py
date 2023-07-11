@@ -21,25 +21,24 @@ class Statistic(Dataframe, metaclass=MethodLoggerMeta):
         super().__init__(csv_file=csv_file, *args, **kwargs)
         self.stat_name = stat_name
         self.days = days
-    
+
     def num_days_to_calculate(self) -> int:
         num_earnings = self.num_earnings
         if self.days >= num_earnings:
             return num_earnings
         return num_earnings - self.days
-    
+
     def get_window_length(self) -> int:
         if self.days >= self.num_earnings:
             return self.num_earnings
         return self.days
-    
+
     def get_index(self) -> list[int]:
         idx = [idx for idx in range(self.num_earnings - 1, self.days - 1, -1)]
         if self.days >= self.num_earnings:
             idx = [idx for idx in range(self.num_earnings - 1, -1, -1)]
         return idx
-        
-    
+
     @property
     def num_earnings(self) -> int:
         return self.df.shape[0]

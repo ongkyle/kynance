@@ -17,10 +17,10 @@ from clients.mixins import create_client, create_rh_client, Clients
 
 
 class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
-    def __init__(self, max_workers:int, tickers: list[str], 
-                 days: int, client_username: str, 
+    def __init__(self, max_workers: int, tickers: list[str],
+                 days: int, client_username: str,
                  client_password: str, client_mfa: str,
-                 optionslam_username: str, optionslam_password: str, 
+                 optionslam_username: str, optionslam_password: str,
                  data_dir: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.max_workers = max_workers
@@ -29,7 +29,7 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         self.optionslam_username = optionslam_username
         self.optionslam_password = optionslam_password
         self.rh_client = create_rh_client(username=client_username,
-                                          password=client_password, 
+                                          password=client_password,
                                           mfa_code=client_mfa)
         self.stat_factory = StatisticFactory(days)
         self.data_dir = data_dir
@@ -45,7 +45,6 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         df = pd.DataFrame.from_dict(data)
         df = self.reorder_cols(df)
 
-
     def print(self, df: pd.DataFrame):
         pd.set_option('display.max_columns', None)
         print(df.sort_values("profit_probability %", ascending=False))
@@ -57,15 +56,15 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         cols = cols[-2:] + cols[:-2]
         df = df[cols]
         return df
-    
+
     def get_ticker_data_dir(self, ticker: str):
         return f"{self.data_dir}/{ticker}/"
-    
+
     def get_ticker_destination_file(self, ticker: str):
         return os.path.join(
-                    self.get_ticker_data_dir(ticker=ticker),
-                    "earnings.csv"
-                )
+            self.get_ticker_data_dir(ticker=ticker),
+            "earnings.csv"
+        )
 
     def filter_valid_tickers(self, tickers: List[str]):
         valid_tickers = []
@@ -86,7 +85,7 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
                 continue
 
             valid_tickers.append(ticker)
-        
+
         return valid_tickers
 
     def calculate_statistics(self, source_file, ticker):
@@ -121,7 +120,7 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
 
     def submit_fn_to_executor(self, executor, fn, tickers):
         future_to_symbol = dict()
-        for ticker in tickers:  
+        for ticker in tickers:
             destination_file = self.get_ticker_destination_file(ticker=ticker)
             future = executor.submit(
                 fn,

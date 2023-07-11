@@ -6,6 +6,7 @@ from log.metaclass import MethodLoggerMeta
 
 __metaclass__ = MethodLoggerMeta
 
+
 class PrintStyles(Enum):
     markdown = 0
     string = 1
@@ -54,8 +55,7 @@ class Dataframe(LoggingMixin):
 
     def print(self, additional_cols, style=PrintStyles.string):
         cols = self.display_cols + additional_cols
-        match style:
-            case PrintStyles.markdown:
-                print(self.df[cols].to_markdown())
-            case PrintStyles.string:
-                print(self.df[cols].to_string())
+        if style == PrintStyles.markdown:
+            print(self.df[cols].to_markdown())
+        if style == PrintStyles.string:
+            print(self.df[cols].to_string())

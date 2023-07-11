@@ -108,27 +108,26 @@ class JournalBackfill(Cmd, Journal):
                   f"strikes close: {strikes_traded_close}, premium open: {premium_open}, premium close: {premium_close}")
 
     def calculate_profit(self, open, close, num_contracts, strategy):
-        match strategy:
-            case OptionStrategy.long_put_spread:
-                return self.calculate_long_put_spread_profit(open, close, num_contracts)
-            case OptionStrategy.long_call_spread:
-                return self.calculate_long_call_spread_profit(open, close, num_contracts)
-            case OptionStrategy.custom:
-                return self.calculate_custom_profit(open, close, num_contracts)
-            case OptionStrategy.strangle:
-                return self.calculate_strangle_profit(open, close, num_contracts)
-            case OptionStrategy.long_call:
-                return self.calculate_long_call_profit(open, close, num_contracts)
-            case OptionStrategy.long_put:
-                return self.calculate_long_put_profit(open, close, num_contracts)
-            case OptionStrategy.iron_condor:
-                return self.calculate_iron_condor_profit(open, close, num_contracts)
-            case OptionStrategy.short_call_spread:
-                return self.calculate_short_call_spread_profit(open, close, num_contracts)
-            case OptionStrategy.short_put_spread:
-                return self.calculate_short_put_spread_profit(open, close, num_contracts)
-            case OptionStrategy.straddle:
-                return self.calculate_straddle_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.long_put_spread:
+            return self.calculate_long_put_spread_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.long_call_spread:
+            return self.calculate_long_call_spread_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.custom:
+            return self.calculate_custom_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.strangle:
+            return self.calculate_strangle_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.long_call:
+            return self.calculate_long_call_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.long_put:
+            return self.calculate_long_put_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.iron_condor:
+            return self.calculate_iron_condor_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.short_call_spread:
+            return self.calculate_short_call_spread_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.short_put_spread:
+            return self.calculate_short_put_spread_profit(open, close, num_contracts)
+        if strategy == OptionStrategy.straddle:
+            return self.calculate_straddle_profit(open, close, num_contracts)
 
     def calculate_long_put_spread_profit(self, open, close, num_contracts):
         return close - open

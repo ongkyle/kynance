@@ -11,22 +11,20 @@ class ValidatorFactory(object):
         self.file = file
 
     def create(self, validator_type: Validators) -> Validator:
-        match validator_type:
-            case Validators.ticker:
-                return TickerValidator(self.ticker, self.client)
-            case Validators.data:
-                return DataValidator(file=self.file)
-            case Validators.option:
-                return OptionsValidator(self.ticker, self.client)
-            case Validators.earnings:
-                return EarningsValidator(self.ticker, self.client)
-        
+        if validator_type == Validators.ticker:
+            return TickerValidator(self.ticker, self.client)
+        if validator_type == Validators.data:
+            return DataValidator(file=self.file)
+        if validator_type == Validators.option:
+            return OptionsValidator(self.ticker, self.client)
+        if validator_type == Validators.earnings:
+            return EarningsValidator(self.ticker, self.client)
 
 
 class ValidatorMixin(object):
 
     @staticmethod
-    def validate(ticker: str, file:str, client: ValidationClient):
+    def validate(ticker: str, file: str, client: ValidationClient):
         factory = ValidatorFactory(ticker=ticker, file=file, client=client)
         for validator_type in Validators:
             validator = factory.create(validator_type=validator_type)
@@ -43,8 +41,7 @@ class ValidatorMixin(object):
     @staticmethod
     def validate_options(ticker: str, client: ValidationClient):
         OptionsValidator(ticker, client).validate()
-    
+
     @staticmethod
     def validate_earnings(ticker: str, client: ValidationClient):
         EarningsValidator(ticker=ticker, client=client).validate()
-
