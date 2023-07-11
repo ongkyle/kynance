@@ -1,3 +1,4 @@
+import os.path
 from urllib.error import HTTPError
 from datetime import date
 import numpy as np
@@ -12,6 +13,7 @@ from requests_cache import CacheMixin, SQLiteCache
 from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
 from pyrate_limiter import Duration, RequestRate, Limiter
 
+from env import parse_env_var
 from log.metaclass import MethodLoggerMeta
 
 __metaclass__ = MethodLoggerMeta
@@ -57,10 +59,11 @@ class YFinanceValidation(ValidationClient, object):
 class YFinance(OptionsClient, object):
     def __init__(self, ticker, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        cache_dir = parse_env_var("CACHE_LOCATION")
         self.session = CachedLimiterSession(
             limiter=Limiter(RequestRate(2, Duration.SECOND * 5)),  # max 2 requests per 5 seconds
             bucket_class=MemoryQueueBucket,
-            backend=SQLiteCache("/home/kyle/workspace/kynance/yfinance.cache"))
+            backend=SQLiteCache(os.path.join(cache_dir, "yfinance.cache")))
         self.ticker = yfinance.Ticker(ticker=ticker, session=self.session)
 
     def exists(self, ticker=None):

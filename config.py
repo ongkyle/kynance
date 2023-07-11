@@ -1,8 +1,10 @@
-LOG_CONFIG_FILE="/kynance/log/config.yml"
+from env import parse_env_var
+
+LOG_CONFIG_FILE = parse_env_var("LOG_CONFIG_FILE")
 
 DEFAULT_REQUIRES_ENV_VAR = True
 
-REQUIRED_ENV_VARS = {
+REQUIRED_COMMAND_LINE_DEFAULTS = {
     "--rh-username": "RH_USERNAME",
     "--rh-password": "RH_PASSWORD",
     "--rh-mfa": "RH_MFA",
@@ -13,6 +15,12 @@ REQUIRED_ENV_VARS = {
     "--data-dir": "DATA_DIR",
     "--data-source": "DEFAULT_CLIENT"
 }
+
+REQUIRED_ENV_VARS = [
+    "LOG_CONFIG_FILE",
+    "LOG_FILE",
+    "CACHE_LOCATION"
+]
 
 PARSER_CONFIG = {
     "--file": {

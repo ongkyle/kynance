@@ -20,10 +20,11 @@ def init_logger():
 
 def get_parser_config():
     config = {}
-    ensure_env_vars(REQUIRED_ENV_VARS.values())
+    ensure_env_vars(REQUIRED_COMMAND_LINE_DEFAULTS.values())
+    ensure_env_vars(REQUIRED_ENV_VARS)
     for name, arg_config in PARSER_CONFIG.items():
         if arg_config.get("default", None) == DEFAULT_REQUIRES_ENV_VAR:
-            arg_config["default"] = parse_env_var(REQUIRED_ENV_VARS[name])
+            arg_config["default"] = parse_env_var(REQUIRED_COMMAND_LINE_DEFAULTS[name])
         config[name] = arg_config
     return config
 

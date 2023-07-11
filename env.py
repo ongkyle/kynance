@@ -22,7 +22,7 @@ def ensure_env_var(var):
 def parse_env_var(var):
     try:
         var = json.loads(os.getenv(var))
-    except json.decoder.JSONDecodeError as err:
+    except json.decoder.JSONDecodeError as _:
         var = os.getenv(var)
     return var
 

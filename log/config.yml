@@ -7,7 +7,8 @@ handlers:
     class: logging.handlers.RotatingFileHandler
     level: DEBUG
     formatter: simple
-    filename: /kynance/kynance.log
+    ## TODO: make configurable
+    filename: /Users/kyleo/kyworkspace/kynance/kynance.log
     # 10 MB
     maxBytes: 10000000
     backupCount: 2
