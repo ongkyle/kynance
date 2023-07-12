@@ -9,3 +9,4 @@ build/**
 dist
 dist/**
 cache/**
+kynance.spec
