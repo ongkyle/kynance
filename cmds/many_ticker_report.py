@@ -44,11 +44,14 @@ class ManyTickerReport(Cmd, ValidatorMixin, LoggingMixin):
         data = self.resolve_futures(future_to_symbol)
         df = pd.DataFrame.from_dict(data)
         df = self.reorder_cols(df)
+        self.print(df)
 
     def print(self, df: pd.DataFrame):
         pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_rows', None)
         print(df.sort_values("profit_probability %", ascending=False))
         pd.reset_option('display.max_columns')
+        pd.reset_option('display.max_rows', None)
 
     @staticmethod
     def reorder_cols(df):
