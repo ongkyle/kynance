@@ -2,10 +2,10 @@
 venv
 venv/**
 **/__pycache__
-yfinance.cache
 *.ipynb
 kynance.log*
 build
 build/**
 dist
 dist/**
+cache/**
